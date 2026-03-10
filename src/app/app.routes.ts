@@ -1,3 +1,20 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  {
+    path: '',
+    title: 'Home',
+    loadComponent: () => import('./features/home/home').then((m) => m.Home),
+  },
+  {
+    path: 'characters',
+    loadChildren: () =>
+      import('./features/characters/characters.routes').then((m) => m.CHARACTERS_ROUTES),
+  },
+  {
+    path: '**',
+    title: 'Page not found',
+    loadComponent: () =>
+      import('./shared/pages/not-found/not-found').then((m) => m.NotFound),
+  },
+];

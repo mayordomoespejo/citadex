@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install @angular/animations@^21.2.0)",
+      "Read(//Users/Miguel/Downloads/**)",
+      "Bash(npx svgo \"/Users/Miguel/Downloads/Rick_and_Morty 14.46.55.svg\" -o src/assets/logo.svg --config='{\"\"plugins\"\":[\"\"removeDoctype\"\",\"\"removeXMLProcInst\"\",\"\"removeComments\"\",\"\"removeMetadata\"\",\"\"removeEditorsNSData\"\",\"\"cleanupAttrs\"\",\"\"mergeStyles\"\",\"\"inlineStyles\"\",\"\"minifyStyles\"\",\"\"cleanupIds\"\",\"\"removeUselessDefs\"\",\"\"cleanupNumericValues\"\",\"\"convertColors\"\",\"\"removeUnknownsAndDefaults\"\",\"\"removeNonInheritableGroupAttrs\"\",\"\"removeUselessStrokeAndFill\"\",\"\"removeViewBox\"\",\"\"cleanupEnableBackground\"\",\"\"removeHiddenElems\"\",\"\"removeEmptyText\"\",\"\"convertShapeToPath\"\",\"\"convertEllipseToCircle\"\",\"\"moveElemsAttrsToGroup\"\",\"\"moveGroupAttrsToElems\"\",\"\"collapseGroups\"\",\"\"convertPathData\"\",\"\"convertTransform\"\",\"\"removeEmptyAttrs\"\",\"\"removeEmptyContainers\"\",\"\"mergePaths\"\",\"\"removeUnusedNS\"\",\"\"sortDefsChildren\"\",\"\"removeTitle\"\",\"\"removeDesc\"\"]}')",
+      "Bash(npx svgo \"/Users/Miguel/Downloads/Rick_and_Morty 14.46.55.svg\" -o src/assets/logo.svg)"
+    ],
+    "additionalDirectories": [
+      "/Users/Miguel/Downloads"
+    ]
+  }
+}

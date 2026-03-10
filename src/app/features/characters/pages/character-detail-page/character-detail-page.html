@@ -1,0 +1,65 @@
+<div class="detail-page">
+  <a class="detail-page__back" routerLink="/characters">{{ T.DETAIL_BACK_LINK }}</a>
+
+  @if (isLoading()) {
+    <div class="detail-page__state">
+      <p class="detail-page__message">{{ T.COMMON_LOADING }}</p>
+    </div>
+  } @else if (error()) {
+    <div class="detail-page__state">
+      <p class="detail-page__message detail-page__message--error">{{ error() }}</p>
+    </div>
+  } @else if (character(); as c) {
+    <div class="detail-page__content">
+      <div class="detail-page__image-wrapper">
+        <img class="detail-page__image" [src]="c.image" [alt]="c.name" />
+      </div>
+
+      <div class="detail-page__info">
+        <div class="detail-page__header">
+          <h1 class="detail-page__name">{{ c.name }}</h1>
+          <button
+            class="detail-page__favorite-btn"
+            [class.detail-page__favorite-btn--active]="isFavorite()"
+            (click)="toggleFavorite()"
+            [attr.aria-label]="isFavorite() ? T.COMMON_FAVORITE_REMOVE_ARIA : T.COMMON_FAVORITE_ADD_ARIA"
+          >
+            {{ isFavorite() ? '♥' : '♡' }}
+          </button>
+        </div>
+
+        <p class="detail-page__status-line">
+          <span class="detail-page__status-dot detail-page__status-dot--{{ c.status.toLowerCase() }}"></span>
+          {{ c.status }} — {{ c.species }}
+        </p>
+
+        <dl class="detail-page__facts">
+          <div class="detail-page__fact">
+            <dt>{{ T.DETAIL_FACT_GENDER }}</dt>
+            <dd>{{ c.gender }}</dd>
+          </div>
+
+          <div class="detail-page__fact">
+            <dt>{{ T.DETAIL_FACT_TYPE }}</dt>
+            <dd>{{ c.type || '—' }}</dd>
+          </div>
+
+          <div class="detail-page__fact">
+            <dt>{{ T.DETAIL_FACT_ORIGIN }}</dt>
+            <dd>{{ c.origin.name }}</dd>
+          </div>
+
+          <div class="detail-page__fact">
+            <dt>{{ T.COMMON_LAST_KNOWN_LOCATION }}</dt>
+            <dd>{{ c.location.name }}</dd>
+          </div>
+
+          <div class="detail-page__fact">
+            <dt>{{ T.DETAIL_FACT_EPISODES }}</dt>
+            <dd>{{ c.episode.length }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  }
+</div>
