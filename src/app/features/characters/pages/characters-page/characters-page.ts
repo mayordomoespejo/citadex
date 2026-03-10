@@ -5,7 +5,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs';
-import { animate, query, stagger, style, transition, trigger } from '@angular/animations';
 
 import { CharactersService } from '../../services/characters.service';
 import { CharacterCard } from '../../components/character-card/character-card';
@@ -13,25 +12,16 @@ import { SelectComponent } from '../../../../shared/components/select/select';
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
+/**
+ * Lists all characters with real-time search, dropdown filters and pagination.
+ * The URL query string is the single source of truth for the current state:
+ * URL → queryParamMap → HTTP → signals → template.
+ */
 @Component({
   selector: 'app-characters-page',
   imports: [CharacterCard, ReactiveFormsModule, SelectComponent],
   templateUrl: './characters-page.html',
   styleUrl: './characters-page.scss',
-  animations: [
-    trigger('listStagger', [
-      transition('* => *', [
-        query(
-          ':enter',
-          [
-            style({ opacity: 0, transform: 'translateY(12px)' }),
-            stagger(30, [animate('250ms ease-out', style({ opacity: 1, transform: 'none' }))]),
-          ],
-          { optional: true },
-        ),
-      ]),
-    ]),
-  ],
 })
 export class CharactersPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -39,23 +29,22 @@ export class CharactersPage implements OnInit {
   private readonly charactersService = inject(CharactersService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly searchControl = new FormControl('', { nonNullable: true });
-
-  readonly filtersGroup = new FormGroup({
+  protected readonly searchControl = new FormControl('', { nonNullable: true });
+  protected readonly filtersGroup = new FormGroup({
     status: new FormControl('', { nonNullable: true }),
     gender: new FormControl('', { nonNullable: true }),
   });
 
   protected readonly T = TEXTS;
 
-  readonly statusOptions = [
+  protected readonly statusOptions = [
     { label: TEXTS.CHARACTERS_FILTER_STATUS_ALL, value: '' },
     { label: TEXTS.CHARACTERS_FILTER_STATUS_ALIVE, value: 'alive' },
     { label: TEXTS.CHARACTERS_FILTER_STATUS_DEAD, value: 'dead' },
     { label: TEXTS.CHARACTERS_FILTER_STATUS_UNKNOWN, value: 'unknown' },
   ];
 
-  readonly genderOptions = [
+  protected readonly genderOptions = [
     { label: TEXTS.CHARACTERS_FILTER_GENDER_ALL, value: '' },
     { label: TEXTS.CHARACTERS_FILTER_GENDER_FEMALE, value: 'female' },
     { label: TEXTS.CHARACTERS_FILTER_GENDER_MALE, value: 'male' },
@@ -63,14 +52,13 @@ export class CharactersPage implements OnInit {
     { label: TEXTS.CHARACTERS_FILTER_GENDER_UNKNOWN, value: 'unknown' },
   ];
 
-  characters = signal<Character[]>([]);
-  info = signal<ApiInfo | null>(null);
-  currentPage = signal(1);
-  isLoading = signal(false);
-  error = signal<string | null>(null);
+  protected readonly characters = signal<Character[]>([]);
+  protected readonly info = signal<ApiInfo | null>(null);
+  protected readonly currentPage = signal(1);
+  protected readonly isLoading = signal(false);
+  protected readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    // Pipeline principal: la URL es la fuente de verdad
     this.route.queryParamMap
       .pipe(
         map((params) => ({
@@ -108,7 +96,6 @@ export class CharactersPage implements OnInit {
         this.isLoading.set(false);
       });
 
-    // Búsqueda de texto: debounced, resetea página
     this.searchControl.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((name) => {
@@ -118,7 +105,6 @@ export class CharactersPage implements OnInit {
         });
       });
 
-    // Filtros de selección: inmediatos, resetean página
     this.filtersGroup.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ status, gender }) => {
@@ -129,7 +115,7 @@ export class CharactersPage implements OnInit {
       });
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.router.navigate([], {
       queryParams: { page },
       queryParamsHandling: 'merge',

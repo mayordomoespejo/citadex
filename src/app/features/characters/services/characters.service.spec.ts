@@ -22,7 +22,6 @@ describe('CharactersService', () => {
   });
 
   afterEach(() => {
-    // Verifica que no haya peticiones HTTP pendientes sin gestionar
     httpMock.verify();
   });
 

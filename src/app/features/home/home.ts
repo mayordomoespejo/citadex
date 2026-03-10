@@ -1,22 +1,11 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
+import { HomeService, HomeStats } from './home.service';
 import { TEXTS } from '../../shared/i18n/texts';
 
-interface ApiStats {
-  characters: number;
-  episodes: number;
-  locations: number;
-}
-
-interface ApiCountResponse {
-  info: { count: number };
-}
-
+/** Landing page with a hero section and live universe stats fetched from the API. */
 @Component({
   selector: 'app-home',
   imports: [RouterLink],
@@ -24,27 +13,16 @@ interface ApiCountResponse {
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  private readonly http = inject(HttpClient);
+  private readonly homeService = inject(HomeService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly base = environment.apiBaseUrl;
 
   protected readonly T = TEXTS;
-
-  stats = signal<ApiStats | null>(null);
+  protected readonly stats = signal<HomeStats | null>(null);
 
   ngOnInit(): void {
-    forkJoin({
-      characters: this.http.get<ApiCountResponse>(`${this.base}/character`),
-      episodes: this.http.get<ApiCountResponse>(`${this.base}/episode`),
-      locations: this.http.get<ApiCountResponse>(`${this.base}/location`),
-    })
+    this.homeService
+      .getStats()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((res) => {
-        this.stats.set({
-          characters: res.characters.info.count,
-          episodes: res.episodes.info.count,
-          locations: res.locations.info.count,
-        });
-      });
+      .subscribe((stats) => this.stats.set(stats));
   }
 }

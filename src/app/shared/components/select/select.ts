@@ -4,16 +4,23 @@ import {
   HostListener,
   computed,
   forwardRef,
+  inject,
   input,
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
+/** A single option in the select dropdown. */
 export interface SelectOption {
   value: string;
   label: string;
 }
 
+/**
+ * Custom accessible select component that integrates with Angular reactive forms.
+ * Implements `ControlValueAccessor` for seamless `formControlName` / `ngModel` usage.
+ * Closes on outside click via a document-level host listener.
+ */
 @Component({
   selector: 'app-select',
   templateUrl: './select.html',
@@ -27,30 +34,31 @@ export interface SelectOption {
   ],
 })
 export class SelectComponent implements ControlValueAccessor {
-  options = input.required<SelectOption[]>();
-  placeholder = input('Select...');
+  /** Available options to display in the dropdown. */
+  readonly options = input.required<SelectOption[]>();
+  readonly placeholder = input('Select…');
 
-  isOpen = signal(false);
-  value = signal<string>('');
-  isDisabled = signal(false);
+  private readonly host = inject(ElementRef);
 
-  selectedLabel = computed(() => {
+  protected readonly isOpen = signal(false);
+  protected readonly value = signal<string>('');
+  protected readonly isDisabled = signal(false);
+
+  protected readonly selectedLabel = computed(() => {
     const opt = this.options().find((o) => o.value === this.value());
     return opt ? opt.label : this.placeholder();
   });
 
-  hasValue = computed(() => this.value() !== '');
+  protected readonly hasValue = computed(() => this.value() !== '');
 
   private onChange: (v: string) => void = () => {};
   private onTouched: () => void = () => {};
 
-  constructor(private readonly host: ElementRef) {}
-
-  toggle(): void {
+  protected toggle(): void {
     if (!this.isDisabled()) this.isOpen.update((v) => !v);
   }
 
-  select(option: SelectOption): void {
+  protected select(option: SelectOption): void {
     this.value.set(option.value);
     this.onChange(option.value);
     this.onTouched();
@@ -58,13 +66,12 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
+  protected onDocumentClick(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target)) {
       this.isOpen.set(false);
     }
   }
 
-  // ControlValueAccessor
   writeValue(value: string): void {
     this.value.set(value ?? '');
   }

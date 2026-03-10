@@ -36,9 +36,9 @@
       <p class="characters-page__message">{{ T.CHARACTERS_PAGE_EMPTY }}</p>
     </div>
   } @else {
-    <div class="characters-page__grid" [@listStagger]="characters().length">
-      @for (character of characters(); track character.id) {
-        <app-character-card [character]="character" />
+    <div class="characters-page__grid">
+      @for (character of characters(); track character.id; let i = $index) {
+        <app-character-card [character]="character" [style.--card-index]="i" />
       }
     </div>
 

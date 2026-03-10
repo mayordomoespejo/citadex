@@ -5,6 +5,10 @@ import { Character } from '../../models/character.model';
 import { FavoritesService } from '../../services/favorites.service';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
+/**
+ * Card component representing a single character in the grid.
+ * Navigates to the character detail page on click.
+ */
 @Component({
   selector: 'app-character-card',
   imports: [RouterLink],
@@ -12,15 +16,17 @@ import { TEXTS } from '../../../../shared/i18n/texts';
   styleUrl: './character-card.scss',
 })
 export class CharacterCard {
-  protected readonly T = TEXTS;
-
-  character = input.required<Character>();
+  /** The character data to display. */
+  readonly character = input.required<Character>();
 
   private readonly favoritesService = inject(FavoritesService);
 
-  isFavorite = computed(() => this.favoritesService.isFavorite(this.character().id));
+  protected readonly T = TEXTS;
+  protected readonly isFavorite = computed(() =>
+    this.favoritesService.isFavorite(this.character().id),
+  );
 
-  onFavoriteToggle(event: Event): void {
+  protected onFavoriteToggle(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.favoritesService.toggle(this.character().id);
