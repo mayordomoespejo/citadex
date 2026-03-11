@@ -1,59 +1,77 @@
 # Citadex
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
+A Rick & Morty character explorer built with Angular 21. Browse, filter, search and save your favourite characters from the multiverse.
 
-## Development server
+**Live data** from the [Rick & Morty API](https://rickandmortyapi.com/).
 
-To start a local development server, run:
+---
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Angular 21 — standalone components, signals, `inject()` |
+| Styles | SCSS + BEM + CSS custom properties (design tokens) |
+| HTTP | `HttpClient` with `withFetch()`, reactive pipelines |
+| Routing | Angular Router — lazy-loaded feature routes, custom `TitleStrategy` |
+| Forms | Reactive Forms (`FormControl`, `FormGroup`) |
+| Tests | Vitest + Angular TestBed + `HttpTestingController` |
+| Linting / Format | ESLint + Prettier |
+
+---
+
+## Architecture
+
+```
+src/app/
+├── core/                        # App-wide singletons (TitleStrategy)
+├── features/
+│   ├── home/                    # Landing page + HomeService (stats)
+│   └── characters/              # Characters feature (lazy-loaded)
+│       ├── components/          # CharacterCard
+│       ├── models/              # Character, CharactersResponse interfaces
+│       ├── pages/               # CharactersPage, CharacterDetailPage
+│       └── services/            # CharactersService, FavoritesService
+├── layout/
+│   └── header/                  # Fixed app header with active-link nav
+└── shared/
+    ├── components/select/       # Accessible custom select (ControlValueAccessor)
+    ├── i18n/texts.ts            # Centralised UI copy (no i18n library needed)
+    └── pages/not-found/         # 404 fallback page
+```
+
+### Key patterns
+
+- **URL as source of truth** — search, filters and page are stored in query params. The URL is always shareable and bookmarkable.
+- **Reactive pipeline** — `queryParamMap` → `switchMap` → HTTP → signals → template. `catchError` inside `switchMap` keeps the stream alive after 404s.
+- **CSS stagger animation** — card grid entrance uses a `--card-index` CSS custom property set from the `@for` loop index, driving `animation-delay` in pure CSS (`@keyframes card-enter`). No `@angular/animations` dependency.
+- **Design tokens** — all colours, spacing, typography and transitions live in `src/styles/_variables.scss` as CSS custom properties, consumed throughout the app.
+
+---
+
+## Commands
 
 ```bash
+# Development server (http://localhost:4200)
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
+# Production build (output: dist/)
 ng build
-```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
+# Unit tests (watch mode)
 ng test
+
+# Unit tests (single run, CI)
+ng test --watch=false
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## Features
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Home** — hero with live universe stats (characters, episodes, locations)
+- **Characters list** — paginated grid with debounced search and status/gender filters
+- **Character detail** — full profile: image, status, species, origin, last known location, episode count
+- **Favourites** — toggle favourite on any card or detail page; persisted in `localStorage`
+- **404 page** — friendly fallback for unknown routes
+- **Dynamic page titles** — each route updates `<title>` via a custom `TitleStrategy`

@@ -1,0 +1,69 @@
+<section class="characters-page">
+  <div class="characters-page__toolbar">
+    <div class="characters-page__toolbar-left">
+      <h1 class="characters-page__title">{{ T.CHARACTERS_PAGE_TITLE }}</h1>
+      @if (!isLoading() && !error() && info(); as pageInfo) {
+        <span class="characters-page__count">{{ pageInfo.count }} {{ T.CHARACTERS_PAGE_RESULTS_SUFFIX }}</span>
+      }
+    </div>
+
+    <div class="characters-page__controls">
+      <input
+        class="characters-page__search"
+        type="search"
+        [placeholder]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
+        [formControl]="searchControl"
+      />
+
+      <div class="characters-page__filters" [formGroup]="filtersGroup">
+        <app-select [options]="statusOptions" formControlName="status" />
+        <app-select [options]="genderOptions" formControlName="gender" />
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="characters-page__state">
+      <p class="characters-page__message">{{ T.COMMON_LOADING }}</p>
+    </div>
+  } @else if (error()) {
+    <div class="characters-page__state">
+      <p class="characters-page__message characters-page__message--error">{{ error() }}</p>
+    </div>
+  } @else if (characters().length === 0) {
+    <div class="characters-page__state">
+      <p class="characters-page__empty-icon">🔍</p>
+      <p class="characters-page__message">{{ T.CHARACTERS_PAGE_EMPTY }}</p>
+    </div>
+  } @else {
+    <div class="characters-page__grid">
+      @for (character of characters(); track character.id; let i = $index) {
+        <app-character-card [character]="character" [style.--card-index]="i" />
+      }
+    </div>
+
+    @if (info(); as pageInfo) {
+      <nav class="characters-page__pagination">
+        <button
+          class="characters-page__page-btn"
+          [disabled]="currentPage() === 1"
+          (click)="goToPage(currentPage() - 1)"
+        >
+          {{ T.CHARACTERS_PAGE_PAGINATION_PREV }}
+        </button>
+
+        <span class="characters-page__page-info">
+          {{ T.CHARACTERS_PAGE_PAGINATION_PAGE }} {{ currentPage() }} {{ T.CHARACTERS_PAGE_PAGINATION_OF }} {{ pageInfo.pages }}
+        </span>
+
+        <button
+          class="characters-page__page-btn"
+          [disabled]="!pageInfo.next"
+          (click)="goToPage(currentPage() + 1)"
+        >
+          {{ T.CHARACTERS_PAGE_PAGINATION_NEXT }}
+        </button>
+      </nav>
+    }
+  }
+</section>

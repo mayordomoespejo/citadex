@@ -1,0 +1,90 @@
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  computed,
+  forwardRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+/** A single option in the select dropdown. */
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+/**
+ * Custom accessible select component that integrates with Angular reactive forms.
+ * Implements `ControlValueAccessor` for seamless `formControlName` / `ngModel` usage.
+ * Closes on outside click via a document-level host listener.
+ */
+@Component({
+  selector: 'app-select',
+  templateUrl: './select.html',
+  styleUrl: './select.scss',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SelectComponent),
+      multi: true,
+    },
+  ],
+})
+export class SelectComponent implements ControlValueAccessor {
+  /** Available options to display in the dropdown. */
+  readonly options = input.required<SelectOption[]>();
+  readonly placeholder = input('Select…');
+
+  private readonly host = inject(ElementRef);
+
+  protected readonly isOpen = signal(false);
+  protected readonly value = signal<string>('');
+  protected readonly isDisabled = signal(false);
+
+  protected readonly selectedLabel = computed(() => {
+    const opt = this.options().find((o) => o.value === this.value());
+    return opt ? opt.label : this.placeholder();
+  });
+
+  protected readonly hasValue = computed(() => this.value() !== '');
+
+  private onChange: (v: string) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  protected toggle(): void {
+    if (!this.isDisabled()) this.isOpen.update((v) => !v);
+  }
+
+  protected select(option: SelectOption): void {
+    this.value.set(option.value);
+    this.onChange(option.value);
+    this.onTouched();
+    this.isOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    if (!this.host.nativeElement.contains(event.target)) {
+      this.isOpen.set(false);
+    }
+  }
+
+  writeValue(value: string): void {
+    this.value.set(value ?? '');
+  }
+
+  registerOnChange(fn: (v: string) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(disabled: boolean): void {
+    this.isDisabled.set(disabled);
+  }
+}
