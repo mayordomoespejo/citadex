@@ -9,8 +9,16 @@
         class="header__nav-link"
         routerLink="/characters"
         routerLinkActive="header__nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
       >
         {{ T.HEADER_NAV_CHARACTERS }}
+      </a>
+      <a
+        class="header__nav-link"
+        routerLink="/favorites"
+        routerLinkActive="header__nav-link--active"
+      >
+        {{ T.HEADER_NAV_FAVORITES }}
       </a>
     </nav>
   </div>

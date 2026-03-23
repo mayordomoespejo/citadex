@@ -52,6 +52,25 @@ export const TEXTS = {
   DETAIL_FACT_LOCATION: 'Last known location',
   DETAIL_FACT_EPISODES: 'Episodes',
 
+  // ── Favorites page ─────────────────────────────────────────────────────────
+  HEADER_NAV_FAVORITES: 'Favorites',
+  FAVORITES_PAGE_TITLE: 'Favorites',
+  FAVORITES_PAGE_EMPTY_TITLE: 'No favorites yet',
+  FAVORITES_PAGE_EMPTY_MESSAGE: 'Start exploring characters and add them to your favorites.',
+  FAVORITES_PAGE_EMPTY_CTA: 'Browse characters',
+  FAVORITES_PAGE_ERROR: 'Could not load some favorites. Please try again.',
+
+  // ── Episode list (character detail) ────────────────────────────────────────
+  DETAIL_EPISODES_SECTION_TITLE: 'Episodes',
+  DETAIL_EPISODES_SHOW_ALL: 'Show all episodes',
+  DETAIL_EPISODES_SHOW_LESS: 'Show less',
+
+  // ── Filter chips (characters page) ────────────────────────────────────────
+  CHARACTERS_FILTERS_CLEAR_ALL: 'Clear all',
+  CHARACTERS_FILTER_CHIP_NAME: 'Name',
+  CHARACTERS_FILTER_CHIP_STATUS: 'Status',
+  CHARACTERS_FILTER_CHIP_GENDER: 'Gender',
+
   // ── Not found page ─────────────────────────────────────────────────────────
   NOT_FOUND_CODE: '404',
   NOT_FOUND_TITLE: 'Page not found',

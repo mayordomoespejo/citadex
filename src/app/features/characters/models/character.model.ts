@@ -48,3 +48,12 @@ export interface CharacterFilters {
   gender?: string;
   page?: number;
 }
+
+/** A single episode resource from the Rick & Morty API. */
+export interface Episode {
+  id: number;
+  name: string;
+  air_date: string;
+  /** Episode code in the format S01E01. */
+  episode: string;
+}

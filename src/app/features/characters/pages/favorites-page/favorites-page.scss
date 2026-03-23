@@ -1,0 +1,132 @@
+.favorites-page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+
+  &__toolbar {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+  }
+
+  &__title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+  }
+
+  &__count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  &__error {
+    font-size: var(--font-size-sm);
+    color: var(--color-error);
+    margin-top: calc(var(--space-8) * -1);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-6);
+
+    app-character-card {
+      animation: card-enter 250ms ease-out both;
+      animation-delay: calc(var(--card-index, 0) * 30ms);
+    }
+  }
+
+  @keyframes card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  // ── Empty state ────────────────────────────────────────────────────────────
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-16) 0;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  &__empty-icon {
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+  }
+
+  &__empty-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  &__empty-message {
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+    max-width: 360px;
+  }
+
+  &__empty-cta {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-6);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-primary);
+    background-color: transparent;
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition:
+      background-color var(--transition),
+      color var(--transition);
+
+    &:hover {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+    }
+  }
+
+  // ── Skeleton loading ───────────────────────────────────────────────────────
+  &__skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-6);
+  }
+
+  &__skeleton-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+  }
+
+  &__skeleton-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: var(--color-border);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+}

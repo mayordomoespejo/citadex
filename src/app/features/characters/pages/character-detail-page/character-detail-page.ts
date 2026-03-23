@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CharactersService } from '../../services/characters.service';
 import { FavoritesService } from '../../services/favorites.service';
-import { Character } from '../../models/character.model';
+import { Character, Episode } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
 /**
@@ -31,14 +31,29 @@ export class CharacterDetailPage implements OnInit {
   protected readonly character = signal<Character | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly episodes = signal<Episode[]>([]);
+  protected readonly isLoadingEpisodes = signal(false);
+  protected readonly showAllEpisodes = signal(false);
+
+  protected readonly EPISODES_PREVIEW_COUNT = 10;
+
   protected readonly isFavorite = computed(() => {
     const c = this.character();
     return c ? this.favoritesService.isFavorite(c.id) : false;
   });
 
+  protected readonly visibleEpisodes = computed(() => {
+    const all = this.episodes();
+    return this.showAllEpisodes() ? all : all.slice(0, this.EPISODES_PREVIEW_COUNT);
+  });
+
   protected toggleFavorite(): void {
     const c = this.character();
     if (c) this.favoritesService.toggle(c.id);
+  }
+
+  protected toggleEpisodes(): void {
+    this.showAllEpisodes.update((v) => !v);
   }
 
   ngOnInit(): void {
@@ -52,10 +67,28 @@ export class CharacterDetailPage implements OnInit {
           this.character.set(character);
           this.titleService.setTitle(`${character.name} | Citadex`);
           this.isLoading.set(false);
+          this.loadEpisodes(character.episode);
         },
         error: () => {
           this.error.set(TEXTS.DETAIL_NOT_FOUND_ERROR);
           this.isLoading.set(false);
+        },
+      });
+  }
+
+  private loadEpisodes(urls: string[]): void {
+    if (urls.length === 0) return;
+    this.isLoadingEpisodes.set(true);
+    this.charactersService
+      .getEpisodesByUrls(urls)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (episodes) => {
+          this.episodes.set(episodes);
+          this.isLoadingEpisodes.set(false);
+        },
+        error: () => {
+          this.isLoadingEpisodes.set(false);
         },
       });
   }

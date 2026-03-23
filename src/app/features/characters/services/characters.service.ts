@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { environment } from '../../../../environments/environment';
-import { Character, CharacterFilters, CharacterListResponse } from '../models/character.model';
+import { Character, CharacterFilters, CharacterListResponse, Episode } from '../models/character.model';
 
 /**
  * Data-access service for the Rick & Morty characters API.
@@ -29,5 +30,26 @@ export class CharactersService {
   /** Fetches a single character by its numeric ID. */
   getCharacterById(id: number): Observable<Character> {
     return this.http.get<Character>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Fetches episode details for a list of episode URLs.
+   * Returns an empty array if no URLs are provided.
+   * Individual failed requests are silently omitted from the result.
+   */
+  getEpisodesByUrls(urls: string[]): Observable<Episode[]> {
+    if (urls.length === 0) return of([]);
+    const requests = urls.map((url) =>
+      this.http.get<Episode>(url).pipe(catchError(() => of(null))),
+    );
+    return new Observable<Episode[]>((observer) => {
+      forkJoin(requests).subscribe({
+        next: (results) => {
+          observer.next(results.filter((e): e is Episode => e !== null));
+          observer.complete();
+        },
+        error: (err) => observer.error(err),
+      });
+    });
   }
 }

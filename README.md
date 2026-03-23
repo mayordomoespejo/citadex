@@ -30,6 +30,10 @@ https://citadex.vercel.app
 - Paginated character grid with debounced search and status/gender filters
 - Character detail page with full profile: image, status, species, origin, last known location and episode count
 - Favourite toggle on any card or detail page, persisted in `localStorage`
+- Dedicated `/favorites` page — reactive grid that updates instantly on toggle
+- Episode list on character detail: code, name and air date with show-all toggle
+- Active filter chips below the search bar with individual dismiss and clear-all button
+- Skeleton loaders on character list and detail page while data is fetching
 - URL as source of truth — search, filters and page stored in query params, fully shareable and bookmarkable
 - CSS stagger animation on card grid entrance driven by a `--card-index` custom property, no `@angular/animations` required
 - Dynamic page titles via a custom `TitleStrategy` on every route

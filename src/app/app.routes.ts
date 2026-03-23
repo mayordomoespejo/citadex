@@ -12,6 +12,14 @@ export const routes: Routes = [
       import('./features/characters/characters.routes').then((m) => m.CHARACTERS_ROUTES),
   },
   {
+    path: 'favorites',
+    title: 'Favorites',
+    loadComponent: () =>
+      import('./features/characters/pages/favorites-page/favorites-page').then(
+        (m) => m.FavoritesPage,
+      ),
+  },
+  {
     path: '**',
     title: 'Page not found',
     loadComponent: () =>
