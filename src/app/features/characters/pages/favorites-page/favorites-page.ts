@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -18,10 +19,6 @@ import { CharacterCard } from '../../components/character-card/character-card';
 import { Character } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
-/**
- * Displays all characters the user has marked as favorites.
- * Reads favorite IDs from FavoritesService and fetches each character by ID.
- */
 @Component({
   selector: 'app-favorites-page',
   imports: [CharacterCard, RouterLink],
@@ -37,12 +34,19 @@ export class FavoritesPage implements OnInit {
   protected readonly T = TEXTS;
   protected readonly skeletonItems = Array(8).fill(null);
 
-  protected readonly characters = signal<Character[]>([]);
+  // All characters ever loaded (cache)
+  private readonly allCharacters = signal<Character[]>([]);
   protected readonly isLoading = signal(true);
   protected readonly error = signal<string | null>(null);
 
+  // Reactively filtered by current favorites — updates instantly on toggle
+  protected readonly characters = computed(() => {
+    const ids = this.favoritesService.favoriteIds();
+    return this.allCharacters().filter((c) => ids.has(c.id));
+  });
+
   ngOnInit(): void {
-    const ids = this.favoritesService.getFavoriteIds();
+    const ids = [...this.favoritesService.favoriteIds()];
 
     if (ids.length === 0) {
       this.isLoading.set(false);
@@ -62,7 +66,7 @@ export class FavoritesPage implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((results) => {
         const loaded = results.filter((c): c is Character => c !== null);
-        this.characters.set(loaded);
+        this.allCharacters.set(loaded);
         if (loaded.length < ids.length) {
           this.error.set(TEXTS.FAVORITES_PAGE_ERROR);
         }

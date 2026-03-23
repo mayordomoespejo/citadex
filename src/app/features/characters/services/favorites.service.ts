@@ -7,33 +7,29 @@ import { Injectable, effect, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
   private readonly storageKey = 'citadex-favorites';
-  private readonly favoriteIds = signal<Set<number>>(this.loadFromStorage());
+  private readonly _favoriteIds = signal<Set<number>>(this.loadFromStorage());
+  readonly favoriteIds = this._favoriteIds.asReadonly();
 
   constructor() {
     effect(() => {
-      localStorage.setItem(this.storageKey, JSON.stringify([...this.favoriteIds()]));
+      localStorage.setItem(this.storageKey, JSON.stringify([...this._favoriteIds()]));
     });
-  }
-
-  /** Returns the current set of favorite character IDs as a readonly array. */
-  getFavoriteIds(): number[] {
-    return [...this.favoriteIds()];
   }
 
   /** Returns `true` if the given character ID is in the favorites list. */
   isFavorite(id: number): boolean {
-    return this.favoriteIds().has(id);
+    return this._favoriteIds().has(id);
   }
 
   /** Adds the ID to favorites if absent, removes it if present. */
   toggle(id: number): void {
-    const next = new Set(this.favoriteIds());
+    const next = new Set(this._favoriteIds());
     if (next.has(id)) {
       next.delete(id);
     } else {
       next.add(id);
     }
-    this.favoriteIds.set(next);
+    this._favoriteIds.set(next);
   }
 
   private loadFromStorage(): Set<number> {
