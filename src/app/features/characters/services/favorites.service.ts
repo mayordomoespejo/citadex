@@ -15,6 +15,11 @@ export class FavoritesService {
     });
   }
 
+  /** Returns the current set of favorite character IDs as a readonly array. */
+  getFavoriteIds(): number[] {
+    return [...this.favoriteIds()];
+  }
+
   /** Returns `true` if the given character ID is in the favorites list. */
   isFavorite(id: number): boolean {
     return this.favoriteIds().has(id);

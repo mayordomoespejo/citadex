@@ -1,0 +1,37 @@
+<section class="favorites-page">
+  <div class="favorites-page__toolbar">
+    <h1 class="favorites-page__title">{{ T.FAVORITES_PAGE_TITLE }}</h1>
+    @if (!isLoading() && characters().length > 0) {
+      <span class="favorites-page__count">{{ characters().length }} {{ T.CHARACTERS_PAGE_RESULTS_SUFFIX }}</span>
+    }
+  </div>
+
+  @if (error()) {
+    <p class="favorites-page__error">{{ error() }}</p>
+  }
+
+  @if (isLoading()) {
+    <div class="favorites-page__skeleton-grid">
+      @for (item of skeletonItems; track $index) {
+        <div class="favorites-page__skeleton-card">
+          <div class="favorites-page__skeleton-image"></div>
+        </div>
+      }
+    </div>
+  } @else if (characters().length === 0) {
+    <div class="favorites-page__empty">
+      <p class="favorites-page__empty-icon">♡</p>
+      <h2 class="favorites-page__empty-title">{{ T.FAVORITES_PAGE_EMPTY_TITLE }}</h2>
+      <p class="favorites-page__empty-message">{{ T.FAVORITES_PAGE_EMPTY_MESSAGE }}</p>
+      <a class="favorites-page__empty-cta" routerLink="/characters">
+        {{ T.FAVORITES_PAGE_EMPTY_CTA }}
+      </a>
+    </div>
+  } @else {
+    <div class="favorites-page__grid">
+      @for (character of characters(); track character.id; let i = $index) {
+        <app-character-card [character]="character" [style.--card-index]="i" />
+      }
+    </div>
+  }
+</section>

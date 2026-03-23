@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -11,6 +11,12 @@ import { CharacterCard } from '../../components/character-card/character-card';
 import { SelectComponent } from '../../../../shared/components/select/select';
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
+
+interface FilterChip {
+  key: 'name' | 'status' | 'gender';
+  label: string;
+  value: string;
+}
 
 /**
  * Lists all characters with real-time search, dropdown filters and pagination.
@@ -36,6 +42,7 @@ export class CharactersPage implements OnInit {
   });
 
   protected readonly T = TEXTS;
+  protected readonly skeletonItems = Array(20).fill(null);
 
   protected readonly statusOptions = [
     { label: TEXTS.CHARACTERS_FILTER_STATUS_ALL, value: '' },
@@ -58,6 +65,24 @@ export class CharactersPage implements OnInit {
   protected readonly isLoading = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  /** Tracks current active filter values for chip rendering. */
+  protected readonly activeFilters = signal<{ name: string; status: string; gender: string }>({
+    name: '',
+    status: '',
+    gender: '',
+  });
+
+  protected readonly activeChips = computed<FilterChip[]>(() => {
+    const f = this.activeFilters();
+    const chips: FilterChip[] = [];
+    if (f.name) chips.push({ key: 'name', label: TEXTS.CHARACTERS_FILTER_CHIP_NAME, value: f.name });
+    if (f.status) chips.push({ key: 'status', label: TEXTS.CHARACTERS_FILTER_CHIP_STATUS, value: f.status });
+    if (f.gender) chips.push({ key: 'gender', label: TEXTS.CHARACTERS_FILTER_CHIP_GENDER, value: f.gender });
+    return chips;
+  });
+
+  protected readonly hasActiveFilters = computed(() => this.activeChips().length > 0);
+
   ngOnInit(): void {
     this.route.queryParamMap
       .pipe(
@@ -71,6 +96,7 @@ export class CharactersPage implements OnInit {
           this.searchControl.setValue(name, { emitEvent: false });
           this.filtersGroup.setValue({ status, gender }, { emitEvent: false });
           this.currentPage.set(page);
+          this.activeFilters.set({ name, status, gender });
           this.isLoading.set(true);
           this.error.set(null);
         }),
@@ -118,6 +144,20 @@ export class CharactersPage implements OnInit {
   protected goToPage(page: number): void {
     this.router.navigate([], {
       queryParams: { page },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  protected removeChip(chip: FilterChip): void {
+    this.router.navigate([], {
+      queryParams: { [chip.key]: null, page: null },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  protected clearFilters(): void {
+    this.router.navigate([], {
+      queryParams: { name: null, status: null, gender: null, page: null },
       queryParamsHandling: 'merge',
     });
   }

@@ -22,9 +22,31 @@
     </div>
   </div>
 
+  @if (hasActiveFilters()) {
+    <div class="characters-page__chips">
+      @for (chip of activeChips(); track chip.key) {
+        <button class="characters-page__chip" (click)="removeChip(chip)">
+          <span class="characters-page__chip-label">{{ chip.label }}: {{ chip.value }}</span>
+          <span class="characters-page__chip-remove" aria-hidden="true">×</span>
+        </button>
+      }
+      <button class="characters-page__clear-btn" (click)="clearFilters()">
+        {{ T.CHARACTERS_FILTERS_CLEAR_ALL }}
+      </button>
+    </div>
+  }
+
   @if (isLoading()) {
-    <div class="characters-page__state">
-      <p class="characters-page__message">{{ T.COMMON_LOADING }}</p>
+    <div class="characters-page__skeleton-grid">
+      @for (item of skeletonItems; track $index) {
+        <div class="characters-page__skeleton-card">
+          <div class="characters-page__skeleton-image"></div>
+          <div class="characters-page__skeleton-body">
+            <div class="characters-page__skeleton-line characters-page__skeleton-line--title"></div>
+            <div class="characters-page__skeleton-line characters-page__skeleton-line--sub"></div>
+          </div>
+        </div>
+      }
     </div>
   } @else if (error()) {
     <div class="characters-page__state">

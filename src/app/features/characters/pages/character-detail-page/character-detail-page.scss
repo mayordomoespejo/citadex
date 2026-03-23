@@ -28,6 +28,77 @@
     padding: var(--space-16) 0;
   }
 
+  // ── Skeleton loading ───────────────────────────────────────────────────────
+  &__skeleton {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--space-12);
+    align-items: start;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__skeleton-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-border);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  &__skeleton-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-top: var(--space-2);
+  }
+
+  &__skeleton-line {
+    border-radius: var(--radius-sm);
+    background-color: var(--color-border);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+
+    &--name {
+      height: 32px;
+      width: 55%;
+    }
+
+    &--status {
+      height: 14px;
+      width: 35%;
+      animation-delay: 0.1s;
+    }
+
+    &--label {
+      height: 10px;
+      width: 40%;
+      animation-delay: 0.2s;
+    }
+
+    &--value {
+      height: 16px;
+      width: 60%;
+      animation-delay: 0.25s;
+    }
+  }
+
+  &__skeleton-facts {
+    margin-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-6);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  &__skeleton-fact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
   &__message {
     color: var(--color-text-muted);
 
@@ -164,6 +235,120 @@
       font-size: var(--font-size-base);
       color: var(--color-text);
       font-weight: 500;
+    }
+  }
+
+  // ── Episodes section ───────────────────────────────────────────────────────
+  &__episodes {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  &__episodes-title {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+
+  &__episode-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__episode-item {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--color-border);
+
+    @media (max-width: 480px) {
+      grid-template-columns: 72px 1fr;
+
+      .detail-page__episode-date {
+        grid-column: 2;
+        margin-top: calc(var(--space-1) * -1);
+      }
+    }
+  }
+
+  &__episode-code {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    font-family: monospace;
+    color: var(--color-primary);
+    letter-spacing: 0.04em;
+  }
+
+  &__episode-name {
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__episode-date {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  &__episodes-toggle {
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background-color: transparent;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition:
+      color var(--transition),
+      border-color var(--transition);
+
+    &:hover {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+  }
+
+  // ── Episodes skeleton ──────────────────────────────────────────────────────
+  &__episodes-skeleton {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__episode-skeleton-row {
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-border);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
     }
   }
 }
