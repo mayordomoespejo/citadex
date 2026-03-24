@@ -56,6 +56,10 @@
       outline: none;
       border-color: var(--color-primary);
     }
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
   }
 
   &__filters {
