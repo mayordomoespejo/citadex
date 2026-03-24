@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 import { environment } from '../../../../environments/environment';
 import { Character, CharacterFilters, CharacterListResponse, Episode } from '../models/character.model';
@@ -42,14 +42,8 @@ export class CharactersService {
     const requests = urls.map((url) =>
       this.http.get<Episode>(url).pipe(catchError(() => of(null))),
     );
-    return new Observable<Episode[]>((observer) => {
-      forkJoin(requests).subscribe({
-        next: (results) => {
-          observer.next(results.filter((e): e is Episode => e !== null));
-          observer.complete();
-        },
-        error: (err) => observer.error(err),
-      });
-    });
+    return forkJoin(requests).pipe(
+      map((results) => results.filter((e): e is Episode => e !== null)),
+    );
   }
 }
