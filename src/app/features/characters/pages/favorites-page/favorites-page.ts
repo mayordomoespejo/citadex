@@ -8,7 +8,6 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -55,10 +54,7 @@ export class FavoritesPage implements OnInit {
 
     const requests = ids.map((id) =>
       this.charactersService.getCharacterById(id).pipe(
-        catchError((err: HttpErrorResponse) => {
-          console.warn(`Failed to load character ${id}`, err);
-          return of(null);
-        }),
+        catchError(() => of(null)),
       ),
     );
 

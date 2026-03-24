@@ -43,6 +43,7 @@ export class SelectComponent implements ControlValueAccessor {
   protected readonly isOpen = signal(false);
   protected readonly value = signal<string>('');
   protected readonly isDisabled = signal(false);
+  protected readonly focusedIndex = signal(-1);
 
   protected readonly selectedLabel = computed(() => {
     const opt = this.options().find((o) => o.value === this.value());
@@ -55,7 +56,16 @@ export class SelectComponent implements ControlValueAccessor {
   private onTouched: () => void = () => {};
 
   protected toggle(): void {
-    if (!this.isDisabled()) this.isOpen.update((v) => !v);
+    if (!this.isDisabled()) {
+      const opening = !this.isOpen();
+      this.isOpen.set(opening);
+      if (opening) {
+        const currentIdx = this.options().findIndex((o) => o.value === this.value());
+        this.focusedIndex.set(currentIdx >= 0 ? currentIdx : 0);
+      } else {
+        this.focusedIndex.set(-1);
+      }
+    }
   }
 
   protected select(option: SelectOption): void {
@@ -63,12 +73,63 @@ export class SelectComponent implements ControlValueAccessor {
     this.onChange(option.value);
     this.onTouched();
     this.isOpen.set(false);
+    this.focusedIndex.set(-1);
   }
 
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target)) {
       this.isOpen.set(false);
+      this.focusedIndex.set(-1);
+    }
+  }
+
+  @HostListener('keydown', ['$event'])
+  protected onKeydown(event: KeyboardEvent): void {
+    if (this.isDisabled()) return;
+
+    const opts = this.options();
+
+    switch (event.key) {
+      case 'ArrowDown': {
+        event.preventDefault();
+        if (!this.isOpen()) {
+          this.isOpen.set(true);
+          const currentIdx = opts.findIndex((o) => o.value === this.value());
+          this.focusedIndex.set(currentIdx >= 0 ? currentIdx : 0);
+        } else {
+          this.focusedIndex.update((i) => Math.min(i + 1, opts.length - 1));
+        }
+        break;
+      }
+      case 'ArrowUp': {
+        event.preventDefault();
+        if (this.isOpen()) {
+          this.focusedIndex.update((i) => Math.max(i - 1, 0));
+        }
+        break;
+      }
+      case 'Enter':
+      case ' ': {
+        event.preventDefault();
+        if (!this.isOpen()) {
+          this.isOpen.set(true);
+          const currentIdx = opts.findIndex((o) => o.value === this.value());
+          this.focusedIndex.set(currentIdx >= 0 ? currentIdx : 0);
+        } else {
+          const idx = this.focusedIndex();
+          if (idx >= 0 && idx < opts.length) {
+            this.select(opts[idx]);
+          }
+        }
+        break;
+      }
+      case 'Escape': {
+        event.preventDefault();
+        this.isOpen.set(false);
+        this.focusedIndex.set(-1);
+        break;
+      }
     }
   }
 
