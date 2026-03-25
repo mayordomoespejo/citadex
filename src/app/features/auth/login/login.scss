@@ -123,7 +123,7 @@
         border-color: var(--color-error);
 
         &:focus {
-          outline-color: var(--color-error);
+          border-color: var(--color-error);
         }
       }
     }
@@ -153,9 +153,8 @@
     padding: var(--space-3) var(--space-4);
     font-size: var(--font-size-base);
     color: var(--color-text);
-    transition: border-color var(--transition), outline-color var(--transition);
-    outline: 2px solid transparent;
-    outline-offset: 2px;
+    transition: border-color var(--transition);
+    outline: none;
     box-sizing: border-box;
 
     &::placeholder {
@@ -164,8 +163,8 @@
     }
 
     &:focus {
+      outline: none;
       border-color: var(--color-primary);
-      outline-color: rgba(var(--color-primary-rgb) / 0.3);
     }
   }
 

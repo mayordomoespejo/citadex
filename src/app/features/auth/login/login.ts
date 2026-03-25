@@ -50,6 +50,10 @@ export class Login implements OnInit {
     this.showPassword.update((v) => !v);
   }
 
+  protected removeReadonly(event: FocusEvent): void {
+    (event.target as HTMLInputElement).removeAttribute('readonly');
+  }
+
   protected async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
