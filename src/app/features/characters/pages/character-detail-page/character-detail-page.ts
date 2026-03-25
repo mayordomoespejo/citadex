@@ -49,7 +49,7 @@ export class CharacterDetailPage implements OnInit {
 
   protected toggleFavorite(): void {
     const c = this.character();
-    if (c) this.favoritesService.toggle(c.id);
+    if (c) void this.favoritesService.toggleFavorite(c);
   }
 
   protected toggleEpisodes(): void {

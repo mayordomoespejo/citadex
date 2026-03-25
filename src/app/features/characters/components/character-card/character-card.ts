@@ -29,6 +29,6 @@ export class CharacterCard {
   protected onFavoriteToggle(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.favoritesService.toggle(this.character().id);
+    void this.favoritesService.toggleFavorite(this.character());
   }
 }
