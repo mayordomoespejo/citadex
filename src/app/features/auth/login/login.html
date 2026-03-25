@@ -38,7 +38,9 @@
               class="login__input"
               id="login-password"
               [type]="showPassword() ? 'text' : 'password'"
-              autocomplete="current-password"
+              autocomplete="new-password"
+              [attr.readonly]="true"
+              (focus)="removeReadonly($event)"
               [placeholder]="T.LOGIN_PASSWORD_PLACEHOLDER"
               formControlName="password"
             />
