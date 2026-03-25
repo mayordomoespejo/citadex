@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -11,7 +11,7 @@ import { TEXTS } from '../../../shared/i18n/texts';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -19,6 +19,11 @@ export class Login {
   protected readonly showPassword = signal(false);
   protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly introVisible = signal(true);
+
+  ngOnInit(): void {
+    setTimeout(() => this.introVisible.set(false), 1800);
+  }
 
   protected readonly form = new FormGroup({
     email: new FormControl('', {
