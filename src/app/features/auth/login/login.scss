@@ -21,14 +21,14 @@
 
   &__intro-glow {
     position: absolute;
-    width: 700px;
-    height: 700px;
+    width: 950px;
+    height: 950px;
     border-radius: 50%;
     background: radial-gradient(
       circle,
-      rgba(78, 202, 139, 0.55) 0%,
-      rgba(78, 202, 139, 0.28) 40%,
-      rgba(78, 202, 139, 0.08) 65%,
+      rgba(78, 202, 139, 0.32) 0%,
+      rgba(78, 202, 139, 0.18) 25%,
+      rgba(78, 202, 139, 0.08) 50%,
       transparent 75%
     );
     pointer-events: none;
@@ -36,8 +36,8 @@
   }
 
   &__intro-logo {
-    width: 340px;
-    height: 340px;
+    width: min(1020px, 85vw);
+    height: min(1020px, 85vw);
     object-fit: contain;
     position: relative;
     z-index: 1;
