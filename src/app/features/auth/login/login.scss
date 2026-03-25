@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-6);
-    animation: login-intro-fadeout 0.35s ease-in 1.45s both;
+    animation: login-intro-fadeout 0.35s ease-in 1.45s;
   }
 
   &__intro-glow {
