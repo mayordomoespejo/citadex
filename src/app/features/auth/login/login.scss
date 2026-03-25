@@ -21,22 +21,23 @@
 
   &__intro-glow {
     position: absolute;
-    width: 320px;
-    height: 320px;
+    width: 700px;
+    height: 700px;
     border-radius: 50%;
     background: radial-gradient(
       circle,
-      rgba(78, 202, 139, 0.18) 0%,
-      rgba(78, 202, 139, 0.06) 50%,
-      transparent 70%
+      rgba(78, 202, 139, 0.55) 0%,
+      rgba(78, 202, 139, 0.28) 40%,
+      rgba(78, 202, 139, 0.08) 65%,
+      transparent 75%
     );
     pointer-events: none;
     animation: login-glow-pulse 1.8s ease-in-out both;
   }
 
   &__intro-logo {
-    width: 160px;
-    height: 160px;
+    width: 340px;
+    height: 340px;
     object-fit: contain;
     position: relative;
     z-index: 1;
