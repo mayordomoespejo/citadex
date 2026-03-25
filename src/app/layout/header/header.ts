@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+import { AuthService } from '../../core/auth/auth.service';
 import { TEXTS } from '../../shared/i18n/texts';
 
 @Component({
@@ -10,5 +11,18 @@ import { TEXTS } from '../../shared/i18n/texts';
   styleUrl: './header.scss',
 })
 export class Header {
+  private readonly authService = inject(AuthService);
+
   protected readonly T = TEXTS;
+  protected readonly isAuthenticated = this.authService.isAuthenticated;
+
+  protected readonly userInitial = computed(() => {
+    const user = this.authService.user();
+    if (!user) return null;
+    if (user.displayName) return user.displayName[0].toUpperCase();
+    if (user.email) return user.email[0].toUpperCase();
+    return '?';
+  });
+
+  protected readonly userPhotoURL = computed(() => this.authService.user()?.photoURL ?? null);
 }
