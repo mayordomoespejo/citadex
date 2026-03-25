@@ -1,7 +1,7 @@
 import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts';
 
 // Replace this with the real Citadex Firebase project ID before deploying.
-const FIREBASE_PROJECT_ID = 'CITADEX_FIREBASE_PROJECT_ID';
+const FIREBASE_PROJECT_ID = 'citadex-eeea0';
 
 const JWKS_URL = `https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com`;
 const ISSUER = `https://securetoken.google.com/${FIREBASE_PROJECT_ID}`;
