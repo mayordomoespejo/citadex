@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, OnDestroy, computed, signal } from '@angular/core';
 import {
   GoogleAuthProvider,
   User,
@@ -12,18 +12,51 @@ import {
 
 import { auth } from '../firebase/firebase.config';
 
+export function isFirebaseError(err: unknown): err is { code: string } {
+  return typeof err === 'object' && err !== null && 'code' in err;
+}
+
+export function mapFirebaseError(err: unknown, fallback: string): string {
+  if (isFirebaseError(err)) {
+    switch (err.code) {
+      case 'auth/invalid-email':
+        return 'Introduce un correo electrónico válido.';
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return 'Contraseña incorrecta.';
+      case 'auth/user-not-found':
+        return 'No existe una cuenta con ese correo.';
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos. Inténtalo más tarde.';
+      case 'auth/popup-blocked':
+        return 'El popup fue bloqueado. Permite popups para este sitio.';
+      case 'auth/network-request-failed':
+        return 'Error de red. Comprueba tu conexión.';
+      default:
+        return fallback;
+    }
+  }
+  return fallback;
+}
+
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class AuthService implements OnDestroy {
   readonly user = signal<User | null>(null);
   readonly loading = signal(true);
   readonly isAuthenticated = computed(() => !!this.user());
 
+  private unsubscribeAuth: (() => void) | null = null;
+
   /** Must be called once from the app root to start listening to auth state. */
   init(): void {
-    onAuthStateChanged(auth, (user) => {
+    this.unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       this.user.set(user);
       this.loading.set(false);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeAuth?.();
   }
 
   signInWithEmail(email: string, password: string): Promise<void> {
@@ -42,7 +75,7 @@ export class AuthService {
     try {
       await this.signUpWithEmail(email, password);
     } catch (err: unknown) {
-      if (this.isFirebaseError(err) && err.code === 'auth/email-already-in-use') {
+      if (isFirebaseError(err) && err.code === 'auth/email-already-in-use') {
         await this.signInWithEmail(email, password);
       } else {
         throw err;
@@ -66,7 +99,4 @@ export class AuthService {
     return signOut(auth);
   }
 
-  private isFirebaseError(err: unknown): err is { code: string } {
-    return typeof err === 'object' && err !== null && 'code' in err;
-  }
 }

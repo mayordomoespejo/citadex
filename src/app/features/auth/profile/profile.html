@@ -62,6 +62,7 @@
             class="profile__modal-confirm"
             type="button"
             [disabled]="isDeleting()"
+            [attr.aria-busy]="isDeleting()"
             (click)="onDeleteAccount()"
           >
             @if (isDeleting()) {

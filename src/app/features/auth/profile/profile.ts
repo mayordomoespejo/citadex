@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { deleteUser } from 'firebase/auth';
 
-import { AuthService } from '../../../core/auth/auth.service';
+import { AuthService, isFirebaseError } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../characters/services/favorites.service';
 import { TEXTS } from '../../../shared/i18n/texts';
 
@@ -63,15 +63,15 @@ export class Profile {
     this.deleteError.set(null);
 
     try {
-      this.favoritesService.clearFavorites();
       await deleteUser(user);
+      this.favoritesService.clearFavorites();
       await this.router.navigate(['/login']);
     } catch (err: unknown) {
-      if (this.isFirebaseError(err) && err.code === 'auth/requires-recent-login') {
+      if (isFirebaseError(err) && err.code === 'auth/requires-recent-login') {
         try {
           await this.authService.reauthenticateWithGoogle();
-          this.favoritesService.clearFavorites();
           await deleteUser(user);
+          this.favoritesService.clearFavorites();
           await this.router.navigate(['/login']);
         } catch (reAuthErr: unknown) {
           this.deleteError.set(TEXTS.LOGIN_ERROR_GENERIC);
@@ -84,7 +84,4 @@ export class Profile {
     }
   }
 
-  private isFirebaseError(err: unknown): err is { code: string } {
-    return typeof err === 'object' && err !== null && 'code' in err;
-  }
 }

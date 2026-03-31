@@ -1,5 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { getIdToken } from 'firebase/auth';
+import { User, getIdToken } from 'firebase/auth';
 
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -30,7 +30,13 @@ export class FavoritesService {
   /** Ordered list of favorited characters for display purposes. */
   readonly favorites = computed(() => Array.from(this._favorites().values()));
 
+  /** Last sync error message, or null if the last operation succeeded. */
+  readonly error = signal<string | null>(null);
+
   constructor() {
+    if (!environment.supabaseUrl) {
+      console.error('SUPABASE_URL is not configured in environment.ts')
+    }
     // Auto-load favorites whenever the user signs in
     effect(() => {
       const user = this.authService.user();
@@ -63,15 +69,30 @@ export class FavoritesService {
 
   /** Fetches the user's favorites from Supabase and populates the signal. */
   async loadFavorites(): Promise<void> {
-    const token = await this.getToken();
+    const user = this.authService.user();
+    if (!user) return;
+
+    let token = await this.getToken();
     if (!token) return;
 
-    const res = await fetch(ENDPOINT, {
+    let res = await fetch(ENDPOINT, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok) return;
+    if (res.status === 401) {
+      token = await this.getToken(true);
+      if (!token) return;
+      res = await fetch(ENDPOINT, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
 
+    if (!res.ok) {
+      this.error.set('Failed to sync favorites.');
+      return;
+    }
+
+    this.error.set(null);
     const rows: FavoriteRow[] = await res.json();
     const map = new Map<number, Character>();
     for (const row of rows) {
@@ -82,7 +103,7 @@ export class FavoritesService {
   }
 
   private async addFavorite(character: Character): Promise<void> {
-    const token = await this.getToken();
+    let token = await this.getToken();
     if (!token) return;
 
     // Optimistic update
@@ -90,28 +111,47 @@ export class FavoritesService {
     next.set(character.id, character);
     this._favorites.set(next);
 
-    const res = await fetch(ENDPOINT, {
+    const body = JSON.stringify({
+      character_id: String(character.id),
+      character_data: character,
+    });
+
+    let res = await fetch(ENDPOINT, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        character_id: String(character.id),
-        character_data: character,
-      }),
+      body,
     });
 
+    if (res.status === 401) {
+      token = await this.getToken(true);
+      if (token) {
+        res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body,
+        });
+      }
+    }
+
     if (!res.ok) {
+      this.error.set('Failed to sync favorites.');
       // Rollback on failure
       const rollback = new Map(this._favorites());
       rollback.delete(character.id);
       this._favorites.set(rollback);
+    } else {
+      this.error.set(null);
     }
   }
 
   private async removeFavorite(id: number): Promise<void> {
-    const token = await this.getToken();
+    let token = await this.getToken();
     if (!token) return;
 
     // Optimistic update
@@ -120,24 +160,39 @@ export class FavoritesService {
     next.delete(id);
     this._favorites.set(next);
 
-    const res = await fetch(`${ENDPOINT}?character_id=${id}`, {
+    let res = await fetch(`${ENDPOINT}?character_id=${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!res.ok && saved) {
-      // Rollback on failure
-      const rollback = new Map(this._favorites());
-      rollback.set(id, saved);
-      this._favorites.set(rollback);
+    if (res.status === 401) {
+      token = await this.getToken(true);
+      if (token) {
+        res = await fetch(`${ENDPOINT}?character_id=${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    }
+
+    if (!res.ok) {
+      this.error.set('Failed to sync favorites.');
+      if (saved) {
+        // Rollback on failure
+        const rollback = new Map(this._favorites());
+        rollback.set(id, saved);
+        this._favorites.set(rollback);
+      }
+    } else {
+      this.error.set(null);
     }
   }
 
-  private async getToken(): Promise<string | null> {
+  private async getToken(forceRefresh = false): Promise<string | null> {
     const user = this.authService.user();
     if (!user) return null;
     try {
-      return await getIdToken(user);
+      return await getIdToken(user as User, forceRefresh);
     } catch {
       return null;
     }
