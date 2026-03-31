@@ -1,0 +1,77 @@
+<section class="profile">
+  <div class="profile__card">
+    <h1 class="profile__title">{{ T.PROFILE_TITLE }}</h1>
+
+    @if (user(); as u) {
+      <!-- Avatar -->
+      <div class="profile__avatar-wrapper">
+        @if (u.photoURL) {
+          <img class="profile__avatar" [src]="u.photoURL" [alt]="u.displayName ?? 'Avatar'" />
+        } @else {
+          <div class="profile__avatar profile__avatar--initials" aria-hidden="true">
+            {{ initials() }}
+          </div>
+        }
+      </div>
+
+      <!-- User info -->
+      <div class="profile__info">
+        @if (u.displayName) {
+          <p class="profile__display-name">{{ u.displayName }}</p>
+        }
+        <p class="profile__email">{{ u.email }}</p>
+        <p class="profile__stat">
+          <span class="profile__stat-count">{{ favoritesCount() }}</span>
+          {{ T.PROFILE_FAVORITES_COUNT }}
+        </p>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="profile__actions">
+      <button class="profile__sign-out" type="button" (click)="onSignOut()">
+        {{ T.PROFILE_SIGN_OUT }}
+      </button>
+      <button class="profile__delete" type="button" (click)="openDeleteModal()">
+        {{ T.PROFILE_DELETE_ACCOUNT }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  @if (showDeleteModal()) {
+    <div class="profile__modal-backdrop" (click)="closeDeleteModal()">
+      <div class="profile__modal" role="dialog" [attr.aria-label]="T.PROFILE_DELETE_CONFIRM_TITLE" (click)="$event.stopPropagation()">
+        <h2 class="profile__modal-title">{{ T.PROFILE_DELETE_CONFIRM_TITLE }}</h2>
+        <p class="profile__modal-message">{{ T.PROFILE_DELETE_CONFIRM_MESSAGE }}</p>
+
+        @if (deleteError()) {
+          <p class="profile__modal-error">{{ deleteError() }}</p>
+        }
+
+        <div class="profile__modal-actions">
+          <button
+            class="profile__modal-cancel"
+            type="button"
+            [disabled]="isDeleting()"
+            (click)="closeDeleteModal()"
+          >
+            {{ T.PROFILE_DELETE_CANCEL }}
+          </button>
+          <button
+            class="profile__modal-confirm"
+            type="button"
+            [disabled]="isDeleting()"
+            [attr.aria-busy]="isDeleting()"
+            (click)="onDeleteAccount()"
+          >
+            @if (isDeleting()) {
+              <span class="profile__spinner" aria-hidden="true"></span>
+            }
+            {{ T.PROFILE_DELETE_CONFIRM_CTA }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

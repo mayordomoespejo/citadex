@@ -76,4 +76,38 @@ export const TEXTS = {
   NOT_FOUND_TITLE: 'Page not found',
   NOT_FOUND_MESSAGE: "The page you're looking for doesn't exist.",
   NOT_FOUND_BACK_LINK: 'Back to characters',
+
+  // ── Auth — Login page ───────────────────────────────────────────────────────
+  LOGIN_TITLE: 'Bienvenido',
+  LOGIN_SUBTITLE: 'Inicia sesión o crea una cuenta para continuar.',
+  LOGIN_EMAIL_LABEL: 'Correo electrónico',
+  LOGIN_EMAIL_PLACEHOLDER: 'tu@correo.com',
+  LOGIN_PASSWORD_LABEL: 'Contraseña',
+  LOGIN_PASSWORD_PLACEHOLDER: '••••••••',
+  LOGIN_PASSWORD_SHOW: 'Mostrar contraseña',
+  LOGIN_PASSWORD_HIDE: 'Ocultar contraseña',
+  LOGIN_SUBMIT: 'Continuar',
+  LOGIN_GOOGLE: 'Continuar con Google',
+  LOGIN_ERROR_EMAIL_INVALID: 'Introduce un correo electrónico válido.',
+  LOGIN_ERROR_PASSWORD_REQUIRED: 'La contraseña no puede estar vacía.',
+  LOGIN_ERROR_WRONG_PASSWORD: 'Contraseña incorrecta.',
+  LOGIN_ERROR_USER_NOT_FOUND: 'No existe una cuenta con ese correo.',
+  LOGIN_ERROR_TOO_MANY_REQUESTS: 'Demasiados intentos. Inténtalo más tarde.',
+  LOGIN_ERROR_GENERIC: 'Algo fue mal. Por favor, inténtalo de nuevo.',
+  LOGIN_DIVIDER: 'o',
+
+  // ── Auth — Header ───────────────────────────────────────────────────────────
+  HEADER_NAV_LOGIN: 'Login',
+  HEADER_NAV_PROFILE: 'Perfil',
+
+  // ── Auth — Profile page ─────────────────────────────────────────────────────
+  PROFILE_TITLE: 'Perfil',
+  PROFILE_FAVORITES_COUNT: 'favoritos',
+  PROFILE_SIGN_OUT: 'Cerrar sesión',
+  PROFILE_DELETE_ACCOUNT: 'Eliminar cuenta',
+  PROFILE_DELETE_CONFIRM_TITLE: '¿Eliminar cuenta?',
+  PROFILE_DELETE_CONFIRM_MESSAGE: 'Esta acción es irreversible. Se eliminarán tu cuenta y todos tus favoritos.',
+  PROFILE_DELETE_CONFIRM_CTA: 'Sí, eliminar',
+  PROFILE_DELETE_CANCEL: 'Cancelar',
+  PROFILE_DELETE_REAUTH_MESSAGE: 'Por seguridad, necesitamos que te autentiques de nuevo.',
 } as const;
