@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { AuthService } from '../../../core/auth/auth.service';
+import { AuthService, mapFirebaseError } from '../../../core/auth/auth.service';
 import { TEXTS } from '../../../shared/i18n/texts';
 
 @Component({
@@ -11,7 +11,7 @@ import { TEXTS } from '../../../shared/i18n/texts';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login implements OnInit {
+export class Login implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -21,8 +21,14 @@ export class Login implements OnInit {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly introVisible = signal(true);
 
+  private introTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   ngOnInit(): void {
-    setTimeout(() => this.introVisible.set(false), 1800);
+    this.introTimeoutId = setTimeout(() => this.introVisible.set(false), 1800);
+  }
+
+  ngOnDestroy(): void {
+    if (this.introTimeoutId) clearTimeout(this.introTimeoutId);
   }
 
   protected readonly form = new FormGroup({
@@ -69,7 +75,7 @@ export class Login implements OnInit {
       await this.authService.smartAuth(email, password);
       await this.router.navigate(['/characters']);
     } catch (err: unknown) {
-      this.errorMessage.set(this.mapFirebaseError(err));
+      this.errorMessage.set(mapFirebaseError(err, this.T.LOGIN_ERROR_GENERIC));
     } finally {
       this.isLoading.set(false);
     }
@@ -83,29 +89,10 @@ export class Login implements OnInit {
       await this.authService.signInWithGoogle();
       await this.router.navigate(['/characters']);
     } catch (err: unknown) {
-      this.errorMessage.set(this.mapFirebaseError(err));
+      this.errorMessage.set(mapFirebaseError(err, this.T.LOGIN_ERROR_GENERIC));
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  private mapFirebaseError(err: unknown): string {
-    if (typeof err === 'object' && err !== null && 'code' in err) {
-      const code = (err as { code: string }).code;
-      switch (code) {
-        case 'auth/invalid-email':
-          return TEXTS.LOGIN_ERROR_EMAIL_INVALID;
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-          return TEXTS.LOGIN_ERROR_WRONG_PASSWORD;
-        case 'auth/user-not-found':
-          return TEXTS.LOGIN_ERROR_USER_NOT_FOUND;
-        case 'auth/too-many-requests':
-          return TEXTS.LOGIN_ERROR_TOO_MANY_REQUESTS;
-        default:
-          return TEXTS.LOGIN_ERROR_GENERIC;
-      }
-    }
-    return TEXTS.LOGIN_ERROR_GENERIC;
-  }
 }
