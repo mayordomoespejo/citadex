@@ -8,13 +8,23 @@
     </div>
 
     <div class="characters-page__controls">
-      <input
-        class="characters-page__search"
-        type="search"
-        [placeholder]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
-        [attr.aria-label]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
-        [formControl]="searchControl"
-      />
+      <div class="characters-page__search-wrapper">
+        <input
+          class="characters-page__search"
+          type="search"
+          [placeholder]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
+          [attr.aria-label]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
+          [formControl]="searchControl"
+        />
+        @if (hasSearchValue) {
+          <button
+            class="characters-page__search-clear"
+            type="button"
+            (click)="clearSearch()"
+            aria-label="Clear search"
+          >×</button>
+        }
+      </div>
 
       <div class="characters-page__filters" [formGroup]="filtersGroup">
         <app-select [options]="statusOptions" formControlName="status" />
@@ -23,21 +33,8 @@
     </div>
   </div>
 
-  @if (hasActiveFilters()) {
-    <div class="characters-page__chips">
-      @for (chip of activeChips(); track chip.key) {
-        <button class="characters-page__chip" (click)="removeChip(chip)">
-          <span class="characters-page__chip-label">{{ chip.label }}: {{ chip.value }}</span>
-          <span class="characters-page__chip-remove" aria-hidden="true">×</span>
-        </button>
-      }
-      <button class="characters-page__clear-btn" (click)="clearFilters()">
-        {{ T.CHARACTERS_FILTERS_CLEAR_ALL }}
-      </button>
-    </div>
-  }
 
-  @if (isLoading()) {
+@if (isLoading()) {
     <div class="characters-page__skeleton-grid">
       @for (item of skeletonItems; track $index) {
         <div class="characters-page__skeleton-card">
@@ -71,20 +68,22 @@
           class="characters-page__page-btn"
           [disabled]="currentPage() === 1"
           (click)="goToPage(currentPage() - 1)"
+          [attr.aria-label]="T.CHARACTERS_PAGE_PAGINATION_PREV"
         >
-          {{ T.CHARACTERS_PAGE_PAGINATION_PREV }}
+          ←
         </button>
 
         <span class="characters-page__page-info">
-          {{ T.CHARACTERS_PAGE_PAGINATION_PAGE }} {{ currentPage() }} {{ T.CHARACTERS_PAGE_PAGINATION_OF }} {{ pageInfo.pages }}
+          {{ currentPage() }} / {{ pageInfo.pages }}
         </span>
 
         <button
           class="characters-page__page-btn"
           [disabled]="!pageInfo.next"
           (click)="goToPage(currentPage() + 1)"
+          [attr.aria-label]="T.CHARACTERS_PAGE_PAGINATION_NEXT"
         >
-          {{ T.CHARACTERS_PAGE_PAGINATION_NEXT }}
+          →
         </button>
       </nav>
     }
