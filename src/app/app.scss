@@ -1,3 +1,6 @@
 .main {
   padding-top: var(--header-height);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }

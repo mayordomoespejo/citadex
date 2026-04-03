@@ -1,4 +1,4 @@
-<section class="favorites-page">
+<app-page-layout class="favorites-page">
   <div class="favorites-page__toolbar">
     <h1 class="favorites-page__title">{{ T.FAVORITES_PAGE_TITLE }}</h1>
     @if (!isLoading() && characters().length > 0) {
@@ -20,7 +20,7 @@
     </div>
   } @else if (characters().length === 0) {
     <div class="favorites-page__empty">
-      <p class="favorites-page__empty-icon">♡</p>
+      <p class="favorites-page__empty-icon">🤍</p>
       <h2 class="favorites-page__empty-title">{{ T.FAVORITES_PAGE_EMPTY_TITLE }}</h2>
       <p class="favorites-page__empty-message">{{ T.FAVORITES_PAGE_EMPTY_MESSAGE }}</p>
       <a class="favorites-page__empty-cta" routerLink="/characters">
@@ -34,4 +34,4 @@
       }
     </div>
   }
-</section>
+</app-page-layout>

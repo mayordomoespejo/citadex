@@ -9,6 +9,7 @@ import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } f
 import { CharactersService } from '../../services/characters.service';
 import { CharacterCard } from '../../components/character-card/character-card';
 import { SelectComponent } from '../../../../shared/components/select/select';
+import { PageLayout } from '../../../../shared/components/page-layout/page-layout';
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
@@ -19,7 +20,7 @@ import { TEXTS } from '../../../../shared/i18n/texts';
  */
 @Component({
   selector: 'app-characters-page',
-  imports: [CharacterCard, ReactiveFormsModule, SelectComponent],
+  imports: [CharacterCard, ReactiveFormsModule, SelectComponent, PageLayout],
   templateUrl: './characters-page.html',
   styleUrl: './characters-page.scss',
 })
