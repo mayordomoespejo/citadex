@@ -8,5 +8,5 @@ export const environment = {
     messagingSenderId: '949905048711',
     appId: '1:949905048711:web:419d7c37c7d73b35302422',
   },
-  supabaseUrl: '',
+  supabaseUrl: 'https://lmdqhtucciimcizbchob.supabase.co',
 };

@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -23,8 +22,8 @@ export class FavoritesPage {
   protected readonly T = TEXTS;
   protected readonly skeletonItems = Array(8).fill(null);
 
-  protected readonly isLoading = signal(false);
-  protected readonly error = signal<string | null>(null);
+  // Read error directly from the service so the template reflects real state
+  protected readonly error = this.favoritesService.error;
 
   // Characters come directly from the service's in-memory favorites map
   protected readonly characters = this.favoritesService.favorites;
