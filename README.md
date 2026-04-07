@@ -47,6 +47,69 @@ https://citadex.vercel.app
 
 ---
 
+## Project structure
+
+```
+src/app/
+├── core/                  # App-wide singletons
+│   ├── auth/              # AuthService, authGuard
+│   └── firebase/          # Firebase app initialisation and config
+├── features/              # Vertical slices, one per domain
+│   ├── auth/
+│   │   ├── login/         # Login page component
+│   │   └── profile/       # Profile page component
+│   ├── characters/        # Characters feature
+│   │   ├── components/    # CharacterCard and other presentational components
+│   │   ├── models/        # TypeScript interfaces (Character, ApiResponse, …)
+│   │   ├── pages/         # CharactersPage, CharacterDetailPage, FavoritesPage
+│   │   ├── services/      # CharactersService, FavoritesService
+│   │   └── characters.routes.ts
+│   └── home/              # Home page with universe stats
+├── shared/                # Cross-feature primitives
+│   ├── components/        # Reusable UI components (Select, …)
+│   ├── i18n/              # Static UI strings / text constants
+│   └── pages/             # NotFound page
+├── layout/
+│   └── header/            # App shell header component
+├── app.routes.ts          # Root route table
+├── app.config.ts          # Angular application config (providers)
+└── core/
+    └── app-title.strategy.ts  # Custom TitleStrategy
+```
+
+**Rules:**
+
+- `core/` — injectable singletons provided at the root level. No UI components live here.
+- `features/` — each feature owns its routes, pages, components, services and models. Features do not import from sibling features.
+- `shared/` — stateless, reusable primitives. No feature-specific business logic.
+- `layout/` — structural shell components (header, footer) that wrap the routed content.
+
+---
+
+## Auth flow
+
+Authentication is handled by Firebase and wired into Angular via signals.
+
+**`AuthService` (`core/auth/auth.service.ts`)**
+
+- Exposes a `user` signal (`User | null`) populated by Firebase's `onAuthStateChanged` listener, which is started once from the app root via `authService.init()`.
+- Exposes a `loading` signal that is `true` until the first auth-state event arrives. This prevents a flash of unauthenticated content on page load.
+- Exposes `isAuthenticated` as a computed signal derived from `user`.
+
+**Smart sign-in / sign-up form (`features/auth/login/`)**
+
+- A single email + password form handles both new and returning users.
+- On submit, `AuthService.smartAuth()` attempts `createUserWithEmailAndPassword`. If Firebase returns `auth/email-already-in-use`, it falls back to `signInWithEmailAndPassword` automatically. The user never sees separate sign-in / sign-up screens.
+- Google sign-in is available as a secondary option and uses `signInWithPopup`.
+
+**Auth guard (`core/auth/auth.guard.ts`)**
+
+- Implemented as a functional `CanActivateFn` and applied to every route except `/login`.
+- The guard waits for `loading` to become `false` before evaluating the session (using `toObservable` + `filter`), so it never blocks or redirects based on an incomplete auth check.
+- Unauthenticated navigations are redirected to `/login`.
+
+---
+
 ## Environment variables
 
 Angular uses `src/environments/environment.ts` for build-time configuration (not `.env` files).
@@ -69,11 +132,40 @@ export const environment = {
 };
 ```
 
-See `.env.example` at the project root for a reference of the required values.
-
 For the Supabase Edge Function, set the following secrets via `supabase secrets set`:
 - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key (automatically available in Edge Functions)
 - Update `FIREBASE_PROJECT_ID` placeholder in `supabase/functions/_shared/firebaseAuth.ts` with your real Citadex Firebase project ID.
+
+---
+
+## Supabase Edge Function
+
+The favorites backend runs as a Deno Edge Function at `supabase/functions/citadex-favorites/`.
+
+**Deploy**
+
+```bash
+supabase functions deploy citadex-favorites
+```
+
+The function requires the Supabase CLI to be installed and linked to your project (`supabase login` + `supabase link`).
+
+**How it works**
+
+- Every request must carry a Firebase ID token in the `Authorization: Bearer <token>` header.
+- The function verifies the token against Firebase's public keys via `supabase/functions/_shared/firebaseAuth.ts`.
+- Authenticated requests are routed by HTTP method:
+  - `GET` — returns all favourites for the authenticated user.
+  - `POST` — adds a character ID to the user's favourites.
+  - `DELETE` — removes a character ID from the user's favourites.
+- CORS preflight (`OPTIONS`) is handled explicitly; the allowed origin is controlled by the `ALLOWED_ORIGIN` environment secret (defaults to `*`).
+
+**Secrets required in Supabase**
+
+| Secret | Description |
+|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Available automatically in the Edge Function runtime |
+| `ALLOWED_ORIGIN` | Restrict CORS to your deployed domain (optional; defaults to `*`) |
 
 ---
 
@@ -99,6 +191,40 @@ Open http://localhost:4200 in your browser.
 | `ng build` | Production build, output to `dist/` |
 | `ng test` | Run unit tests in watch mode |
 | `ng test --watch=false` | Run unit tests once (CI) |
+
+---
+
+## Contributing
+
+### Code style
+
+Format is enforced by Prettier (`printWidth: 100`, `singleQuote: true`). Run before committing:
+
+```bash
+npx prettier --write .
+```
+
+### Commit conventions
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <short description>
+
+feat(characters): add episode count to detail page
+fix(auth): prevent redirect flash before auth state resolves
+refactor(favorites): simplify toggle signal logic
+chore: update Angular to 21.3
+```
+
+Common types: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`, `style`, `perf`.
+
+### Pull requests
+
+- Branch from `main`. Use a descriptive branch name that matches the commit type: `feat/`, `fix/`, `chore/`, etc.
+- Keep PRs focused — one logical change per PR.
+- All tests must pass (`ng test --watch=false`) before requesting review.
+- Include a brief description of what changed and why. Screenshots are welcome for UI changes.
 
 ---
 

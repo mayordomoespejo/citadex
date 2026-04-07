@@ -12,6 +12,11 @@ import { TEXTS } from '../../../shared/i18n/texts';
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
+/**
+ * User profile page that shows account info and exposes destructive actions: sign-out
+ * and permanent account deletion. Account deletion re-authenticates via Google popup
+ * when Firebase requires a recent login before the operation is allowed.
+ */
 export class Profile {
   private readonly authService = inject(AuthService);
   private readonly favoritesService = inject(FavoritesService);

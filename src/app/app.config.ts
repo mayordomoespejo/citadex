@@ -5,6 +5,11 @@ import { provideRouter, TitleStrategy } from '@angular/router';
 import { routes } from './app.routes';
 import { AppTitleStrategy } from './core/app-title.strategy';
 
+/**
+ * Root application configuration.
+ * `withFetch()` opts the HTTP client into the native Fetch API (required for SSR compatibility).
+ * The `TitleStrategy` provider swaps in `AppTitleStrategy` for custom per-route page titles.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

@@ -18,6 +18,10 @@ import { TEXTS } from '../../../../shared/i18n/texts';
   styleUrl: './favorites-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+/**
+ * Displays the authenticated user's favorited characters by reading directly from
+ * `FavoritesService`. Uses OnPush change detection since all state is signal-based.
+ */
 export class FavoritesPage {
   private readonly favoritesService = inject(FavoritesService);
 

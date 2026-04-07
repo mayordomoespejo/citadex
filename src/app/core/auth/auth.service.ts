@@ -12,10 +12,17 @@ import {
 
 import { auth } from '../firebase/firebase.config';
 
+/**
+ * Returns true if the given error is a Firebase error object with a `code` property.
+ */
 export function isFirebaseError(err: unknown): err is { code: string } {
   return typeof err === 'object' && err !== null && 'code' in err;
 }
 
+/**
+ * Maps a Firebase auth error code to a user-facing Spanish message.
+ * Returns `fallback` for unrecognized codes or non-Firebase errors.
+ */
 export function mapFirebaseError(err: unknown, fallback: string): string {
   if (isFirebaseError(err)) {
     switch (err.code) {
@@ -39,6 +46,11 @@ export function mapFirebaseError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+/**
+ * Singleton service that manages Firebase authentication state.
+ * Exposes reactive signals (`user`, `loading`, `isAuthenticated`) and methods for
+ * email/password sign-up, sign-in, Google OAuth, sign-out, and re-authentication.
+ */
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
   readonly user = signal<User | null>(null);
@@ -95,6 +107,7 @@ export class AuthService implements OnDestroy {
     return reauthenticateWithPopup(user, provider).then(() => undefined);
   }
 
+  /** Signs the current user out of Firebase and clears the local auth state. */
   signOut(): Promise<void> {
     return signOut(auth);
   }

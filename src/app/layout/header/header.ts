@@ -10,6 +10,10 @@ import { TEXTS } from '../../shared/i18n/texts';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
+/**
+ * Global application header. Reflects the current auth state to show/hide navigation
+ * links and renders the user's avatar initial or photo pulled from `AuthService`.
+ */
 export class Header {
   private readonly authService = inject(AuthService);
 

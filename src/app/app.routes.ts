@@ -2,6 +2,11 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/auth/auth.guard';
 
+/**
+ * Application route table. All feature routes use `loadComponent` / `loadChildren` for
+ * lazy loading, and every protected route is gated by `authGuard`, which waits for the
+ * Firebase auth state before allowing or redirecting the navigation.
+ */
 export const routes: Routes = [
   {
     path: 'login',

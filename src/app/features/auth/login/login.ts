@@ -11,6 +11,11 @@ import { TEXTS } from '../../../shared/i18n/texts';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
+/**
+ * Authentication page that handles both sign-up and sign-in via a single form.
+ * Delegates to `AuthService.smartAuth`, which attempts registration first and falls
+ * back to sign-in if the email is already in use.
+ */
 export class Login implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -60,6 +65,10 @@ export class Login implements OnInit, OnDestroy {
     (event.target as HTMLInputElement).removeAttribute('readonly');
   }
 
+  /**
+   * Validates the form and calls `smartAuth` with the entered credentials.
+   * On success navigates to `/characters`; on failure surfaces a localized error message.
+   */
   protected async onSubmit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
