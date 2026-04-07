@@ -67,7 +67,11 @@ export class FavoritesService {
     this._favorites.set(new Map());
   }
 
-  /** Fetches the user's favorites from Supabase and populates the signal. */
+  /**
+   * Fetches the authenticated user's favorites from the Supabase Edge Function and replaces
+   * the local signal with the result. Called automatically whenever the user signs in via
+   * the reactive `effect` in the constructor.
+   */
   async loadFavorites(): Promise<void> {
     const user = this.authService.user();
     if (!user) return;
@@ -89,6 +93,11 @@ export class FavoritesService {
     this._favorites.set(map);
   }
 
+  /**
+   * Adds a character to favorites using an optimistic update: the signal is updated immediately
+   * so the UI responds without delay, then the change is persisted to Supabase. If the server
+   * request fails, the signal is rolled back to its previous state.
+   */
   private async addFavorite(character: Character): Promise<void> {
     // Optimistic update
     const next = new Map(this._favorites());
@@ -117,6 +126,11 @@ export class FavoritesService {
     }
   }
 
+  /**
+   * Removes a character from favorites using an optimistic update: the entry is deleted from
+   * the signal immediately, then the deletion is confirmed with Supabase. If the server request
+   * fails, the character is restored to the signal.
+   */
   private async removeFavorite(id: number): Promise<void> {
     // Optimistic update
     const saved = this._favorites().get(id);
@@ -142,8 +156,9 @@ export class FavoritesService {
   }
 
   /**
-   * Fetches `url` with a Bearer token, retrying once with a force-refreshed
-   * token if the server returns 401.
+   * Wraps `fetch` with automatic Firebase Bearer token injection. If the server responds with
+   * 401, the token is force-refreshed and the request is retried once before returning the
+   * final response.
    */
   private async fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
     let token = await this.getToken();
