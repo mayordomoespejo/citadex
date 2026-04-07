@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth';
 
 import { auth } from '../firebase/firebase.config';
+import { TEXTS } from '../../shared/i18n/texts';
 
 /**
  * Returns true if the given error is a Firebase error object with a `code` property.
@@ -27,18 +28,18 @@ export function mapFirebaseError(err: unknown, fallback: string): string {
   if (isFirebaseError(err)) {
     switch (err.code) {
       case 'auth/invalid-email':
-        return 'Introduce un correo electrónico válido.';
+        return TEXTS.AUTH_ERROR_INVALID_EMAIL;
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
-        return 'Contraseña incorrecta.';
+        return TEXTS.AUTH_ERROR_INVALID_CREDENTIAL;
       case 'auth/user-not-found':
-        return 'No existe una cuenta con ese correo.';
+        return TEXTS.AUTH_ERROR_USER_NOT_FOUND;
       case 'auth/too-many-requests':
-        return 'Demasiados intentos. Inténtalo más tarde.';
+        return TEXTS.AUTH_ERROR_TOO_MANY_REQUESTS;
       case 'auth/popup-blocked':
-        return 'El popup fue bloqueado. Permite popups para este sitio.';
+        return TEXTS.AUTH_ERROR_POPUP_BLOCKED;
       case 'auth/network-request-failed':
-        return 'Error de red. Comprueba tu conexión.';
+        return TEXTS.AUTH_ERROR_NETWORK_REQUEST_FAILED;
       default:
         return fallback;
     }

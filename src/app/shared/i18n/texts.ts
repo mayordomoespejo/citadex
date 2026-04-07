@@ -110,4 +110,12 @@ export const TEXTS = {
   PROFILE_DELETE_CONFIRM_CTA: 'Sí, eliminar',
   PROFILE_DELETE_CANCEL: 'Cancelar',
   PROFILE_DELETE_REAUTH_MESSAGE: 'Por seguridad, necesitamos que te autentiques de nuevo.',
+
+  // ── Auth errors ───────────────────────────────────────────────────────────
+  AUTH_ERROR_INVALID_EMAIL: 'Introduce un correo electrónico válido.',
+  AUTH_ERROR_INVALID_CREDENTIAL: 'Contraseña incorrecta.',
+  AUTH_ERROR_USER_NOT_FOUND: 'No existe una cuenta con ese correo.',
+  AUTH_ERROR_TOO_MANY_REQUESTS: 'Demasiados intentos. Inténtalo más tarde.',
+  AUTH_ERROR_POPUP_BLOCKED: 'El popup fue bloqueado. Permite popups para este sitio.',
+  AUTH_ERROR_NETWORK_REQUEST_FAILED: 'Error de red. Comprueba tu conexión.',
 } as const;
