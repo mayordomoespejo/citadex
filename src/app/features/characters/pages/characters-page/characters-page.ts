@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -29,6 +29,7 @@ const SKELETON_COUNT = 20;
   imports: [CharacterCard, ReactiveFormsModule, SelectComponent, PageLayout],
   templateUrl: './characters-page.html',
   styleUrl: './characters-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharactersPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -75,6 +76,12 @@ export class CharactersPage implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setupQueryParamListener();
+    this.setupSearchListener();
+    this.setupFilterListener();
+  }
+
+  private setupQueryParamListener(): void {
     this.route.queryParamMap
       .pipe(
         map((params) => ({
@@ -111,7 +118,9 @@ export class CharactersPage implements OnInit {
         this.info.set(response.info);
         this.isLoading.set(false);
       });
+  }
 
+  private setupSearchListener(): void {
     this.searchControl.valueChanges
       .pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((name) => {
@@ -120,7 +129,9 @@ export class CharactersPage implements OnInit {
           queryParamsHandling: 'merge',
         });
       });
+  }
 
+  private setupFilterListener(): void {
     this.filtersGroup.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ status, gender }) => {
