@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HomeService, HomeStats } from './home.service';
 import { TEXTS } from '../../shared/i18n/texts';
 
-/** Landing page with a hero section and live universe stats fetched from the API. */
+/** Landing page component with a hero section and live universe stats. The `stats` signal is populated on init via `HomeService.getStats()` and drives the stats display in the template. */
 @Component({
   selector: 'app-home',
   imports: [RouterLink],

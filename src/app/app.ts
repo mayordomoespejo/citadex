@@ -10,6 +10,7 @@ import { AuthService } from './core/auth/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
+/** Root component of the application. Calls `AuthService.init()` in the constructor to bootstrap authentication state before any route renders. */
 export class App {
   constructor() {
     inject(AuthService).init();
