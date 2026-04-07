@@ -5,6 +5,9 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService, mapFirebaseError } from '../../../core/auth/auth.service';
 import { TEXTS } from '../../../shared/i18n/texts';
 
+// Duration of the intro fade-out animation (matches CSS transition)
+const INTRO_ANIMATION_DURATION_MS = 1800;
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
@@ -29,7 +32,7 @@ export class Login implements OnInit, OnDestroy {
   private introTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
-    this.introTimeoutId = setTimeout(() => this.introVisible.set(false), 1800);
+    this.introTimeoutId = setTimeout(() => this.introVisible.set(false), INTRO_ANIMATION_DURATION_MS);
   }
 
   ngOnDestroy(): void {
@@ -62,7 +65,9 @@ export class Login implements OnInit, OnDestroy {
   }
 
   protected removeReadonly(event: FocusEvent): void {
-    (event.target as HTMLInputElement).removeAttribute('readonly');
+    if (event.target instanceof HTMLInputElement) {
+      event.target.removeAttribute('readonly');
+    }
   }
 
   /**

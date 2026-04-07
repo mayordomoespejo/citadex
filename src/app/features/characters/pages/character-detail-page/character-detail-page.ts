@@ -35,6 +35,7 @@ export class CharacterDetailPage implements OnInit {
   protected readonly isLoadingEpisodes = signal(false);
   protected readonly showAllEpisodes = signal(false);
 
+  // Show first N episodes; user can expand to see all
   protected readonly EPISODES_PREVIEW_COUNT = 10;
 
   protected readonly isFavorite = computed(() => {

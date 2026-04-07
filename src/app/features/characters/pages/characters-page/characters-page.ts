@@ -13,6 +13,12 @@ import { PageLayout } from '../../../../shared/components/page-layout/page-layou
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
+// Debounce search input to avoid excessive API calls
+const SEARCH_DEBOUNCE_MS = 400;
+
+// Matches Rick & Morty API default page size
+const SKELETON_COUNT = 20;
+
 /**
  * Lists all characters with real-time search, dropdown filters and pagination.
  * The URL query string is the single source of truth for the current state:
@@ -37,7 +43,7 @@ export class CharactersPage implements OnInit {
   });
 
   protected readonly T = TEXTS;
-  protected readonly skeletonItems = Array(20).fill(null);
+  protected readonly skeletonItems = Array(SKELETON_COUNT).fill(null);
 
   protected readonly statusOptions = [
     { label: TEXTS.CHARACTERS_FILTER_STATUS_ALL, value: '' },
@@ -107,7 +113,7 @@ export class CharactersPage implements OnInit {
       });
 
     this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((name) => {
         this.router.navigate([], {
           queryParams: { name: name || null, page: null },
