@@ -2,9 +2,10 @@
   <div class="card__media">
     <img
       class="card__image"
-      [src]="character().image"
+      [ngSrc]="character().image"
       [alt]="character().name"
-      loading="lazy"
+      width="300"
+      height="300"
     />
 
     <div class="card__scrim">
