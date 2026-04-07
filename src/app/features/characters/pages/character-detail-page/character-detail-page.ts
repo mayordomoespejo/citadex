@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,6 +19,7 @@ import { CharacterStatus } from '../../components/character-status/character-sta
   imports: [RouterLink, CharacterStatus],
   templateUrl: './character-detail-page.html',
   styleUrl: './character-detail-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);

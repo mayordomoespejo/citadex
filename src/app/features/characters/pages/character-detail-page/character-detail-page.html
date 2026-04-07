@@ -69,7 +69,7 @@
           </div>
         </dl>
 
-        @defer (on immediate) {
+        @defer (on viewport) {
           @if (episodes().length > 0) {
             <div class="detail-page__episodes">
               <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>
@@ -89,6 +89,8 @@
               }
             </div>
           }
+        } @placeholder {
+          <div class="detail-page__episodes-placeholder"></div>
         } @loading {
           <div class="detail-page__episodes-skeleton">
             @for (item of [1,2,3,4,5]; track $index) {
