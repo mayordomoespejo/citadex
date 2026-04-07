@@ -11,7 +11,7 @@ import { CharacterCard } from '../../components/character-card/character-card';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
-// Enough skeletons for a typical favorites grid
+// Favorites grid typically holds fewer items; 8 gives a realistic loading preview
 const SKELETON_COUNT = 8;
 
 @Component({
