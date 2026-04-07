@@ -69,30 +69,34 @@
           </div>
         </dl>
 
-        @if (isLoadingEpisodes()) {
+        @defer (on immediate) {
+          @if (episodes().length > 0) {
+            <div class="detail-page__episodes">
+              <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>
+              <ul class="detail-page__episode-list">
+                @for (ep of visibleEpisodes(); track ep.id) {
+                  <li class="detail-page__episode-item">
+                    <span class="detail-page__episode-code">{{ ep.episode }}</span>
+                    <span class="detail-page__episode-name">{{ ep.name }}</span>
+                    <span class="detail-page__episode-date">{{ ep.air_date }}</span>
+                  </li>
+                }
+              </ul>
+              @if (episodes().length > EPISODES_PREVIEW_COUNT) {
+                <button class="detail-page__episodes-toggle" (click)="toggleEpisodes()">
+                  {{ showAllEpisodes() ? T.DETAIL_EPISODES_SHOW_LESS : T.DETAIL_EPISODES_SHOW_ALL }}
+                </button>
+              }
+            </div>
+          }
+        } @loading {
           <div class="detail-page__episodes-skeleton">
             @for (item of [1,2,3,4,5]; track $index) {
               <div class="detail-page__episode-skeleton-row"></div>
             }
           </div>
-        } @else if (episodes().length > 0) {
-          <div class="detail-page__episodes">
-            <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>
-            <ul class="detail-page__episode-list">
-              @for (ep of visibleEpisodes(); track ep.id) {
-                <li class="detail-page__episode-item">
-                  <span class="detail-page__episode-code">{{ ep.episode }}</span>
-                  <span class="detail-page__episode-name">{{ ep.name }}</span>
-                  <span class="detail-page__episode-date">{{ ep.air_date }}</span>
-                </li>
-              }
-            </ul>
-            @if (episodes().length > EPISODES_PREVIEW_COUNT) {
-              <button class="detail-page__episodes-toggle" (click)="toggleEpisodes()">
-                {{ showAllEpisodes() ? T.DETAIL_EPISODES_SHOW_LESS : T.DETAIL_EPISODES_SHOW_ALL }}
-              </button>
-            }
-          </div>
+        } @error {
+          <p class="detail-page__episodes-error">Could not load episodes.</p>
         }
       </div>
     </div>
