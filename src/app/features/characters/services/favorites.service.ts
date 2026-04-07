@@ -72,20 +72,7 @@ export class FavoritesService {
     const user = this.authService.user();
     if (!user) return;
 
-    let token = await this.getToken();
-    if (!token) return;
-
-    let res = await fetch(ENDPOINT, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.status === 401) {
-      token = await this.getToken(true);
-      if (!token) return;
-      res = await fetch(ENDPOINT, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    }
+    const res = await this.fetchWithRetry(ENDPOINT, {});
 
     if (!res.ok) {
       this.error.set('Failed to sync favorites.');
@@ -103,9 +90,6 @@ export class FavoritesService {
   }
 
   private async addFavorite(character: Character): Promise<void> {
-    let token = await this.getToken();
-    if (!token) return;
-
     // Optimistic update
     const next = new Map(this._favorites());
     next.set(character.id, character);
@@ -116,28 +100,11 @@ export class FavoritesService {
       character_data: character,
     });
 
-    let res = await fetch(ENDPOINT, {
+    const res = await this.fetchWithRetry(ENDPOINT, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body,
     });
-
-    if (res.status === 401) {
-      token = await this.getToken(true);
-      if (token) {
-        res = await fetch(ENDPOINT, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body,
-        });
-      }
-    }
 
     if (!res.ok) {
       this.error.set('Failed to sync favorites.');
@@ -151,29 +118,15 @@ export class FavoritesService {
   }
 
   private async removeFavorite(id: number): Promise<void> {
-    let token = await this.getToken();
-    if (!token) return;
-
     // Optimistic update
     const saved = this._favorites().get(id);
     const next = new Map(this._favorites());
     next.delete(id);
     this._favorites.set(next);
 
-    let res = await fetch(`${ENDPOINT}?character_id=${id}`, {
+    const res = await this.fetchWithRetry(`${ENDPOINT}?character_id=${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
     });
-
-    if (res.status === 401) {
-      token = await this.getToken(true);
-      if (token) {
-        res = await fetch(`${ENDPOINT}?character_id=${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-    }
 
     if (!res.ok) {
       this.error.set('Failed to sync favorites.');
@@ -186,6 +139,29 @@ export class FavoritesService {
     } else {
       this.error.set(null);
     }
+  }
+
+  /**
+   * Fetches `url` with a Bearer token, retrying once with a force-refreshed
+   * token if the server returns 401.
+   */
+  private async fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
+    let token = await this.getToken();
+    const makeHeaders = (t: string): HeadersInit => ({
+      ...(init.headers as Record<string, string>),
+      Authorization: `Bearer ${t}`,
+    });
+
+    let res = await fetch(url, { ...init, headers: makeHeaders(token ?? '') });
+
+    if (res.status === 401) {
+      token = await this.getToken(true);
+      if (token) {
+        res = await fetch(url, { ...init, headers: makeHeaders(token) });
+      }
+    }
+
+    return res;
   }
 
   private async getToken(forceRefresh = false): Promise<string | null> {
