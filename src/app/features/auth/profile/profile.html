@@ -5,11 +5,11 @@
     @if (user(); as u) {
       <!-- Avatar -->
       <div class="profile__avatar-wrapper">
-        @if (u.photoURL) {
-          <img class="profile__avatar" [src]="u.photoURL" [alt]="u.displayName ?? 'Avatar'" />
+        @if (u.photoURL && !imageError()) {
+          <img class="profile__avatar" [src]="u.photoURL" [alt]="u.displayName ?? 'Avatar'" (error)="onImageError()" />
         } @else {
           <div class="profile__avatar profile__avatar--initials" aria-hidden="true">
-            {{ initials() }}
+            {{ userInitial() }}
           </div>
         }
       </div>

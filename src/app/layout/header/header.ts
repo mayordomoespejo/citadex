@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
@@ -29,4 +29,18 @@ export class Header {
   });
 
   protected readonly userPhotoURL = computed(() => this.authService.user()?.photoURL ?? null);
+
+  protected readonly imageError = signal(false);
+
+  constructor() {
+    effect(() => {
+      // Reset error state whenever the photo URL changes (e.g. new user signs in).
+      this.userPhotoURL();
+      this.imageError.set(false);
+    });
+  }
+
+  protected onImageError(): void {
+    this.imageError.set(true);
+  }
 }

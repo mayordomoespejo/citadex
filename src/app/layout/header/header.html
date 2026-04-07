@@ -27,8 +27,8 @@
           routerLinkActive="header__avatar-link--active"
           [attr.aria-label]="T.HEADER_NAV_PROFILE"
         >
-          @if (userPhotoURL()) {
-            <img class="header__avatar" [src]="userPhotoURL()!" [alt]="T.HEADER_NAV_PROFILE" />
+          @if (userPhotoURL() && !imageError()) {
+            <img class="header__avatar" [src]="userPhotoURL()!" [alt]="T.HEADER_NAV_PROFILE" (error)="onImageError()" />
           } @else {
             <span class="header__avatar header__avatar--initials" aria-hidden="true">
               {{ userInitial() }}

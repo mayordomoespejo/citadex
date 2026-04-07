@@ -23,6 +23,7 @@ export class Profile {
   private readonly router = inject(Router);
 
   protected readonly T = TEXTS;
+  protected readonly imageError = signal(false);
   protected readonly showDeleteModal = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
@@ -30,20 +31,17 @@ export class Profile {
   protected readonly user = this.authService.user;
   protected readonly favoritesCount = computed(() => this.favoritesService.favorites().length);
 
-  protected initials = computed(() => {
+  protected readonly userInitial = computed(() => {
     const u = this.user();
     if (!u) return '?';
-    if (u.displayName) {
-      return u.displayName
-        .split(' ')
-        .slice(0, 2)
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase();
-    }
+    if (u.displayName) return u.displayName[0].toUpperCase();
     if (u.email) return u.email[0].toUpperCase();
     return '?';
   });
+
+  protected onImageError(): void {
+    this.imageError.set(true);
+  }
 
   protected async onSignOut(): Promise<void> {
     await this.authService.signOut();
