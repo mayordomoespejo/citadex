@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
@@ -10,6 +10,7 @@ import { UserAvatar } from '../../shared/components/user-avatar/user-avatar';
   imports: [RouterLink, RouterLinkActive, UserAvatar],
   templateUrl: './header.html',
   styleUrl: './header.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Global application header. Reflects the current auth state to show/hide navigation

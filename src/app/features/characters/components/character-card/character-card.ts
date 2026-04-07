@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -10,6 +10,7 @@ import { CharacterStatus } from '../character-status/character-status';
 /** Presentational card component that displays a single character in the grid and navigates to the detail page on click. */
 @Component({
   selector: 'app-character-card',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, NgOptimizedImage, CharacterStatus],
   templateUrl: './character-card.html',
   styleUrl: './character-card.scss',

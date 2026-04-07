@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -11,6 +11,7 @@ import { TEXTS } from '../../shared/i18n/texts';
   imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
   private readonly homeService = inject(HomeService);

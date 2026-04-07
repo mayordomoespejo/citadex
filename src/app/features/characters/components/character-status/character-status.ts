@@ -1,9 +1,10 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Character } from '../../models/character.model';
 
 /** Renders the status indicator dot alongside the character's status and species. */
 @Component({
   selector: 'app-character-status',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './character-status.html',
   styleUrl: './character-status.scss',
 })

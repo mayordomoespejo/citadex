@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { deleteUser } from 'firebase/auth';
 
@@ -12,6 +12,7 @@ import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
   imports: [UserAvatar],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * User profile page that shows account info and exposes destructive actions: sign-out

@@ -1,4 +1,4 @@
-import { Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 
 /**
  * Displays a user avatar: shows the photo URL when valid,
@@ -10,6 +10,7 @@ import { Component, input, signal } from '@angular/core';
  */
 @Component({
   selector: 'app-user-avatar',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-avatar.html',
   styleUrl: './user-avatar.scss',
   host: {

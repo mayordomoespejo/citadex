@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -13,6 +13,7 @@ const INTRO_ANIMATION_DURATION_MS = 1800;
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Authentication page that handles both sign-up and sign-in via a single form.
