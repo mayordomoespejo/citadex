@@ -5,10 +5,11 @@ import { deleteUser } from 'firebase/auth';
 import { AuthService, isFirebaseError } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../characters/services/favorites.service';
 import { TEXTS } from '../../../shared/i18n/texts';
+import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [UserAvatar],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -23,7 +24,6 @@ export class Profile {
   private readonly router = inject(Router);
 
   protected readonly T = TEXTS;
-  protected readonly imageError = signal(false);
   protected readonly showDeleteModal = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
@@ -38,10 +38,6 @@ export class Profile {
     if (u.email) return u.email[0].toUpperCase();
     return '?';
   });
-
-  protected onImageError(): void {
-    this.imageError.set(true);
-  }
 
   protected async onSignOut(): Promise<void> {
     await this.authService.signOut();

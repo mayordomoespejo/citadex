@@ -31,25 +31,6 @@
     justify-content: center;
   }
 
-  &__avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--color-border);
-
-    &--initials {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(var(--color-primary-rgb) / 0.15);
-      border-color: rgba(var(--color-primary-rgb) / 0.4);
-      color: var(--color-primary);
-      font-size: var(--font-size-2xl);
-      font-weight: 700;
-    }
-  }
-
   &__info {
     display: flex;
     flex-direction: column;
