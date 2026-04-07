@@ -7,6 +7,7 @@ import { CharactersService } from '../../services/characters.service';
 import { FavoritesService } from '../../services/favorites.service';
 import { Character, Episode } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
+import { CharacterStatus } from '../../components/character-status/character-status';
 
 /**
  * Displays the full profile of a single character.
@@ -15,7 +16,7 @@ import { TEXTS } from '../../../../shared/i18n/texts';
  */
 @Component({
   selector: 'app-character-detail-page',
-  imports: [RouterLink],
+  imports: [RouterLink, CharacterStatus],
   templateUrl: './character-detail-page.html',
   styleUrl: './character-detail-page.scss',
 })

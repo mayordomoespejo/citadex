@@ -40,10 +40,7 @@
           </button>
         </div>
 
-        <p class="detail-page__status-line">
-          <span class="detail-page__status-dot detail-page__status-dot--{{ c.status.toLowerCase() }}"></span>
-          {{ c.status }} — {{ c.species }}
-        </p>
+        <app-character-status class="detail-page__status-line" [character]="c" />
 
         <dl class="detail-page__facts">
           <div class="detail-page__fact">

@@ -9,10 +9,7 @@
 
     <div class="card__scrim">
       <h2 class="card__name">{{ character().name }}</h2>
-      <p class="card__status-line">
-        <span class="card__status-dot card__status-dot--{{ character().status.toLowerCase() }}"></span>
-        {{ character().status }} · {{ character().species }}
-      </p>
+      <app-character-status class="card__status-line" [character]="character()" />
     </div>
 
     <button
