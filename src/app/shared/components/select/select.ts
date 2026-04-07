@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   HostListener,
@@ -25,6 +26,7 @@ export interface SelectOption {
   selector: 'app-select',
   templateUrl: './select.html',
   styleUrl: './select.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -55,6 +57,7 @@ export class SelectComponent implements ControlValueAccessor {
   private onChange: (v: string) => void = () => {};
   private onTouched: () => void = () => {};
 
+  /** Toggles the dropdown open/closed, initializing keyboard focus to the currently selected option when opening. */
   protected toggle(): void {
     if (!this.isDisabled()) {
       const opening = !this.isOpen();
@@ -68,6 +71,7 @@ export class SelectComponent implements ControlValueAccessor {
     }
   }
 
+  /** Commits the given option as the current value, notifies the form control, and closes the dropdown. */
   protected select(option: SelectOption): void {
     this.value.set(option.value);
     this.onChange(option.value);
@@ -76,14 +80,16 @@ export class SelectComponent implements ControlValueAccessor {
     this.focusedIndex.set(-1);
   }
 
+  /** Closes the dropdown when a click is detected outside the host element. */
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: MouseEvent): void {
-    if (!this.host.nativeElement.contains(event.target)) {
+    if (event.target && !this.host.nativeElement.contains(event.target as Node)) {
       this.isOpen.set(false);
       this.focusedIndex.set(-1);
     }
   }
 
+  /** Handles keyboard navigation (Arrow keys, Enter/Space to select, Escape to close) for accessibility. */
   @HostListener('keydown', ['$event'])
   protected onKeydown(event: KeyboardEvent): void {
     if (this.isDisabled()) return;
@@ -133,6 +139,11 @@ export class SelectComponent implements ControlValueAccessor {
     }
   }
 
+  /**
+   * Sets the internal value from the form model.
+   * Normalizes null/undefined to an empty string because this select only works with string values
+   * and Reactive Forms may pass null on initialization or when the control is reset.
+   */
   writeValue(value: string): void {
     this.value.set(value ?? '');
   }
