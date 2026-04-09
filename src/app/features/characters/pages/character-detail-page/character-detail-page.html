@@ -24,7 +24,14 @@
   } @else if (character(); as c) {
     <div class="detail-page__content">
       <div class="detail-page__image-wrapper">
-        <img class="detail-page__image" [src]="c.image" [alt]="c.name" />
+        <img
+          class="detail-page__image"
+          [ngSrc]="c.image"
+          [alt]="c.name"
+          width="300"
+          height="300"
+          priority
+        />
       </div>
 
       <div class="detail-page__info">
@@ -98,7 +105,7 @@
             }
           </div>
         } @error {
-          <p class="detail-page__episodes-error">Could not load episodes.</p>
+          <p class="detail-page__episodes-error">{{ T.DETAIL_EPISODES_LOAD_ERROR }}</p>
         }
       </div>
     </div>

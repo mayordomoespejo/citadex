@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Character } from '../models/character.model';
+import { TEXTS } from '../../../shared/i18n/texts';
 
 const ENDPOINT = environment.favoritesEndpoint;
 
@@ -86,7 +87,7 @@ export class FavoritesService {
       }
       this._favorites.set(map);
     } catch {
-      this.error.set('Failed to sync favorites.');
+      this.error.set(TEXTS.FAVORITES_SYNC_ERROR);
     }
   }
 
@@ -108,7 +109,7 @@ export class FavoritesService {
       });
       this.error.set(null);
     } catch {
-      this.error.set('Failed to sync favorites.');
+      this.error.set(TEXTS.FAVORITES_SYNC_ERROR);
       // Rollback on failure
       const rollback = new Map(this._favorites());
       rollback.delete(character.id);
@@ -132,7 +133,7 @@ export class FavoritesService {
       await this.request<void>('DELETE', `${ENDPOINT}?character_id=${id}`);
       this.error.set(null);
     } catch {
-      this.error.set('Failed to sync favorites.');
+      this.error.set(TEXTS.FAVORITES_SYNC_ERROR);
       if (saved) {
         // Rollback on failure
         const rollback = new Map(this._favorites());

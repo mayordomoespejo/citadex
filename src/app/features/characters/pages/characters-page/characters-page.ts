@@ -13,10 +13,10 @@ import { PageLayout } from '../../../../shared/components/page-layout/page-layou
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
-// Debounce search input to avoid excessive API calls
+/** Debounce delay in ms to avoid triggering API calls on every keystroke. */
 const SEARCH_DEBOUNCE_MS = 400;
 
-// Matches Rick & Morty API default page size
+/** Number of skeleton cards to show while characters are loading. */
 const SKELETON_COUNT = 20;
 
 /**

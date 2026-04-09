@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -16,7 +17,7 @@ import { CharacterStatus } from '../../components/character-status/character-sta
  */
 @Component({
   selector: 'app-character-detail-page',
-  imports: [RouterLink, CharacterStatus],
+  imports: [RouterLink, NgOptimizedImage, CharacterStatus],
   templateUrl: './character-detail-page.html',
   styleUrl: './character-detail-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,7 +38,7 @@ export class CharacterDetailPage implements OnInit {
   protected readonly isLoadingEpisodes = signal(false);
   protected readonly showAllEpisodes = signal(false);
 
-  // Show first N episodes; user can expand to see all
+  /** Number of episodes shown in preview before the "show all" toggle. */
   protected readonly EPISODES_PREVIEW_COUNT = 10;
 
   /** Derived from FavoritesService — intentionally local to each component that needs favorite state. The service is the single source of truth. */

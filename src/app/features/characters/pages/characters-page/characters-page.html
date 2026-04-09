@@ -52,7 +52,7 @@
     </div>
   } @else if (characters().length === 0) {
     <div class="characters-page__state">
-      <p class="characters-page__empty-icon">🔍</p>
+      <p class="characters-page__empty-icon" aria-hidden="true">🔍</p>
       <p class="characters-page__message">{{ T.CHARACTERS_PAGE_EMPTY }}</p>
     </div>
   } @else {

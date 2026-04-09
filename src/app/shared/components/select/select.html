@@ -1,5 +1,5 @@
 <div class="select" [class.select--open]="isOpen()" [class.select--disabled]="isDisabled()">
-  <!-- Sizer invisible: todas las opciones apiladas definen el ancho máximo -->
+  <!-- Invisible sizer: stacks all options to define the maximum dropdown width -->
   <div class="select__sizer" aria-hidden="true">
     @for (opt of options(); track opt.value) {
       <span>{{ opt.label }}</span>

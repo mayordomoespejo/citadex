@@ -118,4 +118,10 @@ export const TEXTS = {
   AUTH_ERROR_TOO_MANY_REQUESTS: 'Demasiados intentos. Inténtalo más tarde.',
   AUTH_ERROR_POPUP_BLOCKED: 'El popup fue bloqueado. Permite popups para este sitio.',
   AUTH_ERROR_NETWORK_REQUEST_FAILED: 'Error de red. Comprueba tu conexión.',
+
+  // ── Episode loading error ──────────────────────────────────────────────────
+  DETAIL_EPISODES_LOAD_ERROR: 'Could not load episodes.',
+
+  // ── Favorites sync error ───────────────────────────────────────────────────
+  FAVORITES_SYNC_ERROR: 'Failed to sync favorites.',
 } as const;
