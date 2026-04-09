@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { TEXTS } from '../../i18n/texts';
@@ -8,6 +8,7 @@ import { TEXTS } from '../../i18n/texts';
   imports: [RouterLink],
   templateUrl: './not-found.html',
   styleUrl: './not-found.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotFound {
   protected readonly T = TEXTS;

@@ -21,7 +21,7 @@
             class="characters-page__search-clear"
             type="button"
             (click)="clearSearch()"
-            aria-label="Clear search"
+            [attr.aria-label]="T.CHARACTERS_SEARCH_CLEAR_ARIA"
           >×</button>
         }
       </div>

@@ -40,21 +40,25 @@ export class Profile {
     return '?';
   });
 
+  /** Signs the current user out and redirects to the login page. */
   protected async onSignOut(): Promise<void> {
     await this.authService.signOut();
     await this.router.navigate(['/login']);
   }
 
+  /** Opens the account deletion confirmation modal and clears any previous error state. */
   protected openDeleteModal(): void {
     this.deleteError.set(null);
     this.showDeleteModal.set(true);
   }
 
+  /** Closes the account deletion confirmation modal and clears any error state. */
   protected closeDeleteModal(): void {
     this.showDeleteModal.set(false);
     this.deleteError.set(null);
   }
 
+  /** Initiates account deletion: clears favorites and navigates to login on success. */
   protected async onDeleteAccount(): Promise<void> {
     const user = this.user();
     if (!user) return;

@@ -71,6 +71,7 @@ export class CharactersPage implements OnInit {
     return this.searchControl.value.length > 0;
   }
 
+  /** Clears the search input and removes the search query parameter from the URL. */
   protected clearSearch(): void {
     this.searchControl.setValue('');
   }
@@ -142,6 +143,7 @@ export class CharactersPage implements OnInit {
       });
   }
 
+  /** Navigates to the given page by updating the page query parameter. */
   protected goToPage(page: number): void {
     this.router.navigate([], {
       queryParams: { page },

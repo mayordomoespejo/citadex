@@ -51,20 +51,24 @@ export class Login implements OnInit, OnDestroy {
     }),
   });
 
+  /** True if the email field has been touched and contains validation errors. */
   protected get emailInvalid(): boolean {
     const ctrl = this.form.controls.email;
     return ctrl.invalid && ctrl.touched;
   }
 
+  /** True if the password field has been touched and contains validation errors. */
   protected get passwordInvalid(): boolean {
     const ctrl = this.form.controls.password;
     return ctrl.invalid && ctrl.touched;
   }
 
+  /** Toggles the password field between plaintext and masked. */
   protected togglePasswordVisibility(): void {
     this.showPassword.update((v) => !v);
   }
 
+  /** Removes the readonly attribute on focus to unblock browser autofill. */
   protected removeReadonly(event: FocusEvent): void {
     if (event.target instanceof HTMLInputElement) {
       event.target.removeAttribute('readonly');

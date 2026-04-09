@@ -66,6 +66,7 @@ export const TEXTS = {
   DETAIL_EPISODES_SHOW_LESS: 'Show less',
 
   // ── Filter chips (characters page) ────────────────────────────────────────
+  CHARACTERS_SEARCH_CLEAR_ARIA: 'Clear search',
   CHARACTERS_FILTERS_CLEAR_ALL: 'Clear all',
   CHARACTERS_FILTER_CHIP_NAME: 'Name',
   CHARACTERS_FILTER_CHIP_STATUS: 'Status',
