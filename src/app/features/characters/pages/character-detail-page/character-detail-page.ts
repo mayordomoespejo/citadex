@@ -40,6 +40,7 @@ export class CharacterDetailPage implements OnInit {
   // Show first N episodes; user can expand to see all
   protected readonly EPISODES_PREVIEW_COUNT = 10;
 
+  /** Derived from FavoritesService — intentionally local to each component that needs favorite state. The service is the single source of truth. */
   protected readonly isFavorite = computed(() => {
     const c = this.character();
     return c ? this.favoritesService.isFavorite(c.id) : false;

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { deleteUser } from 'firebase/auth';
+import { User, deleteUser } from 'firebase/auth';
 
 import { AuthService, isFirebaseError } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../characters/services/favorites.service';
@@ -63,24 +63,27 @@ export class Profile {
     this.deleteError.set(null);
 
     try {
-      await deleteUser(user);
+      await this.performDeletion(user);
       this.favoritesService.clearFavorites();
       await this.router.navigate(['/login']);
-    } catch (err: unknown) {
-      if (isFirebaseError(err) && err.code === 'auth/requires-recent-login') {
-        try {
-          await this.authService.reauthenticateWithGoogle();
-          await deleteUser(user);
-          this.favoritesService.clearFavorites();
-          await this.router.navigate(['/login']);
-        } catch (reAuthErr: unknown) {
-          this.deleteError.set(TEXTS.LOGIN_ERROR_GENERIC);
-        }
-      } else {
-        this.deleteError.set(TEXTS.LOGIN_ERROR_GENERIC);
-      }
+    } catch {
+      this.deleteError.set(TEXTS.LOGIN_ERROR_GENERIC);
     } finally {
       this.isDeleting.set(false);
+    }
+  }
+
+  /** Attempts to delete the user, re-authenticating via Google if a recent login is required. */
+  private async performDeletion(user: User): Promise<void> {
+    try {
+      await deleteUser(user);
+    } catch (err: unknown) {
+      if (isFirebaseError(err) && err.code === 'auth/requires-recent-login') {
+        await this.authService.reauthenticateWithGoogle();
+        await deleteUser(user);
+      } else {
+        throw err;
+      }
     }
   }
 

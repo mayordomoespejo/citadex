@@ -1,11 +1,13 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { User, getIdToken } from 'firebase/auth';
+import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Character } from '../models/character.model';
 
-const ENDPOINT = `${environment.supabaseUrl}/functions/v1/citadex-favorites`;
+const ENDPOINT = environment.favoritesEndpoint;
 
 interface FavoriteRow {
   character_id: string;
@@ -21,6 +23,7 @@ interface FavoriteRow {
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
   private readonly authService = inject(AuthService);
+  private readonly http = inject(HttpClient);
 
   private readonly _favorites = signal<Map<number, Character>>(new Map());
 
@@ -34,9 +37,6 @@ export class FavoritesService {
   readonly error = signal<string | null>(null);
 
   constructor() {
-    if (!environment.supabaseUrl) {
-      console.error('SUPABASE_URL is not configured in environment.ts')
-    }
     // Auto-load favorites whenever the user signs in
     effect(() => {
       const user = this.authService.user();
@@ -76,21 +76,18 @@ export class FavoritesService {
     const user = this.authService.user();
     if (!user) return;
 
-    const res = await this.fetchWithRetry(ENDPOINT, {});
-
-    if (!res.ok) {
+    try {
+      const rows = await this.request<FavoriteRow[]>('GET', ENDPOINT);
+      this.error.set(null);
+      const map = new Map<number, Character>();
+      for (const row of rows) {
+        const char = row.character_data;
+        map.set(char.id, char);
+      }
+      this._favorites.set(map);
+    } catch {
       this.error.set('Failed to sync favorites.');
-      return;
     }
-
-    this.error.set(null);
-    const rows: FavoriteRow[] = await res.json();
-    const map = new Map<number, Character>();
-    for (const row of rows) {
-      const char = row.character_data;
-      map.set(char.id, char);
-    }
-    this._favorites.set(map);
   }
 
   /**
@@ -104,25 +101,18 @@ export class FavoritesService {
     next.set(character.id, character);
     this._favorites.set(next);
 
-    const body = JSON.stringify({
-      character_id: String(character.id),
-      character_data: character,
-    });
-
-    const res = await this.fetchWithRetry(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-    });
-
-    if (!res.ok) {
+    try {
+      await this.request<void>('POST', ENDPOINT, {
+        character_id: String(character.id),
+        character_data: character,
+      });
+      this.error.set(null);
+    } catch {
       this.error.set('Failed to sync favorites.');
       // Rollback on failure
       const rollback = new Map(this._favorites());
       rollback.delete(character.id);
       this._favorites.set(rollback);
-    } else {
-      this.error.set(null);
     }
   }
 
@@ -138,11 +128,10 @@ export class FavoritesService {
     next.delete(id);
     this._favorites.set(next);
 
-    const res = await this.fetchWithRetry(`${ENDPOINT}?character_id=${id}`, {
-      method: 'DELETE',
-    });
-
-    if (!res.ok) {
+    try {
+      await this.request<void>('DELETE', `${ENDPOINT}?character_id=${id}`);
+      this.error.set(null);
+    } catch {
       this.error.set('Failed to sync favorites.');
       if (saved) {
         // Rollback on failure
@@ -150,33 +139,31 @@ export class FavoritesService {
         rollback.set(id, saved);
         this._favorites.set(rollback);
       }
-    } else {
-      this.error.set(null);
     }
   }
 
   /**
-   * Wraps `fetch` with automatic Firebase Bearer token injection. If the server responds with
-   * 401, the token is force-refreshed and the request is retried once before returning the
-   * final response.
+   * Sends an authenticated request via Angular's HttpClient. Injects a Firebase Bearer token,
+   * and on 401 force-refreshes the token and retries once before throwing.
    */
-  private async fetchWithRetry(url: string, init: RequestInit): Promise<Response> {
-    let token = await this.getToken();
-    const makeHeaders = (t: string): HeadersInit => ({
-      ...(init.headers as Record<string, string>),
-      Authorization: `Bearer ${t}`,
-    });
+  private async request<T>(method: string, url: string, body?: unknown): Promise<T> {
+    const token = await this.getToken();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token ?? ''}` });
 
-    let res = await fetch(url, { ...init, headers: makeHeaders(token ?? '') });
-
-    if (res.status === 401) {
-      token = await this.getToken(true);
-      if (token) {
-        res = await fetch(url, { ...init, headers: makeHeaders(token) });
+    try {
+      return await firstValueFrom(
+        this.http.request<T>(method, url, { headers, body }),
+      );
+    } catch (err) {
+      if (err instanceof HttpErrorResponse && err.status === 401) {
+        const refreshed = await this.getToken(true);
+        const retryHeaders = new HttpHeaders({ Authorization: `Bearer ${refreshed ?? ''}` });
+        return await firstValueFrom(
+          this.http.request<T>(method, url, { headers: retryHeaders, body }),
+        );
       }
+      throw err;
     }
-
-    return res;
   }
 
   private async getToken(forceRefresh = false): Promise<string | null> {
