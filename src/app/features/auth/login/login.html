@@ -22,11 +22,13 @@
             id="login-email"
             type="email"
             autocomplete="email"
+            aria-required="true"
+            [attr.aria-describedby]="emailInvalid ? 'email-error' : null"
             [placeholder]="T.LOGIN_EMAIL_PLACEHOLDER"
             formControlName="email"
           />
           @if (emailInvalid) {
-            <span class="login__error-hint">{{ T.LOGIN_ERROR_EMAIL_INVALID }}</span>
+            <span id="email-error" class="login__error-hint">{{ T.LOGIN_ERROR_EMAIL_INVALID }}</span>
           }
         </div>
 
@@ -39,6 +41,8 @@
               id="login-password"
               [type]="showPassword() ? 'text' : 'password'"
               autocomplete="new-password"
+              aria-required="true"
+              [attr.aria-describedby]="passwordInvalid ? 'password-error' : null"
               [attr.readonly]="true"
               (focus)="removeReadonly($event)"
               [placeholder]="T.LOGIN_PASSWORD_PLACEHOLDER"
@@ -67,7 +71,7 @@
             </button>
           </div>
           @if (passwordInvalid) {
-            <span class="login__error-hint">{{ T.LOGIN_ERROR_PASSWORD_REQUIRED }}</span>
+            <span id="password-error" class="login__error-hint">{{ T.LOGIN_ERROR_PASSWORD_REQUIRED }}</span>
           }
         </div>
 
