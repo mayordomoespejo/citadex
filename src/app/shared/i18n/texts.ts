@@ -125,4 +125,8 @@ export const TEXTS = {
 
   // ── Favorites sync error ───────────────────────────────────────────────────
   FAVORITES_SYNC_ERROR: 'Failed to sync favorites.',
+
+  // ── Retry actions ─────────────────────────────────────────────────────────
+  COMMON_RETRY_LABEL: 'Retry',
+  COMMON_RETRY_ARIA: 'Retry loading',
 } as const;

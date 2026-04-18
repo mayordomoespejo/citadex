@@ -1,8 +1,4 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { signal } from '@angular/core';
 
 // Mock firebase/auth (non-relative — allowed by Angular unit-test runner)
 vi.mock('firebase/auth', () => ({
@@ -14,6 +10,11 @@ vi.mock('firebase/auth', () => ({
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(() => ({})),
 }));
+
+import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 
 import * as firebaseAuth from 'firebase/auth';
 import { FavoritesService } from './favorites.service';

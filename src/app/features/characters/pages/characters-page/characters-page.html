@@ -49,7 +49,7 @@
   } @else if (error()) {
     <div class="characters-page__state">
       <p class="characters-page__message characters-page__message--error">{{ error() }}</p>
-      <button class="characters-page__retry-btn" type="button" (click)="onRetry()">Reintentar</button>
+      <button class="characters-page__retry-btn" type="button" (click)="onRetry()" [attr.aria-label]="T.COMMON_RETRY_ARIA">{{ T.COMMON_RETRY_LABEL }}</button>
     </div>
   } @else if (characters().length === 0) {
     <div class="characters-page__state">

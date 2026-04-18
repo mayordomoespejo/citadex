@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
-// vi.mock for non-relative imports is allowed by Angular's unit-test runner.
+vi.mock('firebase/app', () => ({ initializeApp: vi.fn(() => ({})) }));
+
 vi.mock('firebase/auth', () => ({
   onAuthStateChanged: vi.fn(() => vi.fn()),
   createUserWithEmailAndPassword: vi.fn(),
@@ -11,10 +12,6 @@ vi.mock('firebase/auth', () => ({
   reauthenticateWithPopup: vi.fn(),
   GoogleAuthProvider: class {},
   getAuth: vi.fn(() => ({})),
-}));
-
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
 }));
 
 import * as firebaseAuth from 'firebase/auth';

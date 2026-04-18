@@ -34,7 +34,7 @@
 
   <!-- Delete confirmation modal -->
   @if (showDeleteModal()) {
-    <div class="profile__modal-backdrop" (click)="closeDeleteModal()">
+    <div class="profile__modal-backdrop" aria-hidden="true" (click)="closeDeleteModal()">
       <div class="profile__modal" role="dialog" aria-modal="true" [attr.aria-label]="T.PROFILE_DELETE_CONFIRM_TITLE" (click)="$event.stopPropagation()">
         <h2 class="profile__modal-title">{{ T.PROFILE_DELETE_CONFIRM_TITLE }}</h2>
         <p class="profile__modal-message">{{ T.PROFILE_DELETE_CONFIRM_MESSAGE }}</p>
