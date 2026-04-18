@@ -11,6 +11,9 @@
     class="select__trigger"
     [class.select__trigger--placeholder]="!hasValue()"
     (click)="toggle()"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
+    aria-controls="select-dropdown"
   >
     <span class="select__value">{{ selectedLabel() }}</span>
     <svg
@@ -31,7 +34,7 @@
   </button>
 
   @if (isOpen()) {
-    <ul class="select__dropdown" role="listbox">
+    <ul id="select-dropdown" class="select__dropdown" role="listbox">
       @for (option of options(); track option.value; let i = $index) {
         <li
           class="select__option"

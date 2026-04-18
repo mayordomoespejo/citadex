@@ -151,4 +151,12 @@ export class CharactersPage implements OnInit {
     });
   }
 
+  /** Retries the last failed load by resetting the error state and re-navigating with the current params. */
+  protected onRetry(): void {
+    this.error.set(null);
+    this.router.navigate([], {
+      queryParamsHandling: 'merge',
+    });
+  }
+
 }

@@ -61,6 +61,29 @@ export class CharacterDetailPage implements OnInit {
     this.showAllEpisodes.update((v) => !v);
   }
 
+  /** Retries the character load after a failure. */
+  protected onRetry(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.error.set(null);
+    this.isLoading.set(true);
+
+    this.charactersService
+      .getCharacterById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (character) => {
+          this.character.set(character);
+          this.titleService.setTitle(`${character.name} | Citadex`);
+          this.isLoading.set(false);
+          this.loadEpisodes(character.episode);
+        },
+        error: () => {
+          this.error.set(TEXTS.DETAIL_NOT_FOUND_ERROR);
+          this.isLoading.set(false);
+        },
+      });
+  }
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
