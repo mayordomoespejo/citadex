@@ -7,10 +7,6 @@ vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(() => ({})),
 }));
 
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
-}));
-
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';

@@ -8,7 +8,7 @@
         <div class="detail-page__skeleton-line detail-page__skeleton-line--name"></div>
         <div class="detail-page__skeleton-line detail-page__skeleton-line--status"></div>
         <div class="detail-page__skeleton-facts">
-          @for (item of [1,2,3,4]; track $index) {
+          @for (item of [1,2,3,4]; track item) {
             <div class="detail-page__skeleton-fact">
               <div class="detail-page__skeleton-line detail-page__skeleton-line--label"></div>
               <div class="detail-page__skeleton-line detail-page__skeleton-line--value"></div>
@@ -101,7 +101,7 @@
           <div class="detail-page__episodes-placeholder"></div>
         } @loading {
           <div class="detail-page__episodes-skeleton">
-            @for (item of [1,2,3,4,5]; track $index) {
+            @for (item of [1,2,3,4,5]; track item) {
               <div class="detail-page__episode-skeleton-row"></div>
             }
           </div>

@@ -3,23 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 
-vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn(() => vi.fn()),
-  getAuth: vi.fn(() => ({})),
-  GoogleAuthProvider: vi.fn(),
-  createUserWithEmailAndPassword: vi.fn(),
-  signInWithEmailAndPassword: vi.fn(),
-  signInWithPopup: vi.fn(),
-  signOut: vi.fn(),
-  reauthenticateWithPopup: vi.fn(),
-  deleteUser: vi.fn().mockResolvedValue(undefined),
-  getIdToken: vi.fn(),
-}));
-
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
-}));
-
 import { Login } from './login';
 import { AuthService } from '../../../core/auth/auth.service';
 import { TEXTS } from '../../../shared/i18n/texts';

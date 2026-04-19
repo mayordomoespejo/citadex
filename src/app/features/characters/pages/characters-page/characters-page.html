@@ -36,7 +36,7 @@
 
 @if (isLoading()) {
     <div class="characters-page__skeleton-grid">
-      @for (item of skeletonItems; track $index) {
+      @for (item of skeletonItems; track item) {
         <div class="characters-page__skeleton-card">
           <div class="characters-page__skeleton-image"></div>
           <div class="characters-page__skeleton-body">

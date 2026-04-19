@@ -1,27 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn(() => vi.fn()),
-  getAuth: vi.fn(() => ({})),
-  GoogleAuthProvider: vi.fn(),
-  createUserWithEmailAndPassword: vi.fn(),
-  signInWithEmailAndPassword: vi.fn(),
-  signInWithPopup: vi.fn(),
-  signOut: vi.fn(),
-  reauthenticateWithPopup: vi.fn(),
-  deleteUser: vi.fn().mockResolvedValue(undefined),
-  getIdToken: vi.fn(),
-}));
-
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
-}));
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { signal } from '@angular/core';
 
-import { deleteUser } from 'firebase/auth';
 import { Profile } from './profile';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../characters/services/favorites.service';
@@ -154,8 +136,9 @@ describe('Profile', () => {
     expect(modal).toBeNull();
   });
 
-  it('calls deleteUser when confirm button clicked', async () => {
-    vi.mocked(deleteUser).mockResolvedValue(undefined);
+  it('triggers account deletion when confirm button clicked', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spy = vi.spyOn(component as any, 'performDeletion').mockResolvedValue(undefined);
 
     fixture.nativeElement.querySelector('.profile__delete').click();
     fixture.detectChanges();
@@ -164,11 +147,12 @@ describe('Profile', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(deleteUser).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 
   it('confirm button shows aria-busy during deletion', async () => {
-    vi.mocked(deleteUser).mockReturnValue(new Promise(() => {})); // never resolves
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.spyOn(component as any, 'performDeletion').mockReturnValue(new Promise(() => {})); // never resolves
 
     fixture.nativeElement.querySelector('.profile__delete').click();
     fixture.detectChanges();

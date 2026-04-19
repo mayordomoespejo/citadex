@@ -111,7 +111,7 @@ describe('CharactersPage', () => {
     const nativeEl = fixture.nativeElement as HTMLElement;
     // The page renders empty state when characters().length === 0
     // After loading with empty results, the grid won't be shown
-    expect(nativeEl.querySelector('.characters-page__grid') === null || true).toBe(true);
+    expect(nativeEl.querySelector('.characters-page__grid')).toBeNull();
   });
 
   it('shows error state and retry button when service throws non-404 error', async () => {

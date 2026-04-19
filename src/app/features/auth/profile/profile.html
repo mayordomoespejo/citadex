@@ -26,7 +26,7 @@
       <button class="profile__sign-out" type="button" (click)="onSignOut()">
         {{ T.PROFILE_SIGN_OUT }}
       </button>
-      <button class="profile__delete" type="button" (click)="openDeleteModal()">
+      <button #deleteAccountBtn class="profile__delete" type="button" (click)="openDeleteModal()">
         {{ T.PROFILE_DELETE_ACCOUNT }}
       </button>
     </div>
@@ -45,6 +45,7 @@
 
         <div class="profile__modal-actions">
           <button
+            #modalCancelBtn
             class="profile__modal-cancel"
             type="button"
             [disabled]="isDeleting()"

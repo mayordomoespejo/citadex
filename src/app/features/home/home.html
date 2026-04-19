@@ -15,22 +15,32 @@
       </svg>
     </a>
 
-    @if (stats(); as s) {
-      <div class="home__stats">
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.characters }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_CHARACTERS_LABEL }}</span>
+    @defer (on viewport) {
+      @if (stats(); as s) {
+        <div class="home__stats">
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.characters }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_CHARACTERS_LABEL }}</span>
+          </div>
+          <div class="home__stat-divider"></div>
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.episodes }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_EPISODES_LABEL }}</span>
+          </div>
+          <div class="home__stat-divider"></div>
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.locations }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_LOCATIONS_LABEL }}</span>
+          </div>
         </div>
+      }
+    } @placeholder {
+      <div class="home__stats-skeleton">
+        <div class="home__stat-skeleton"></div>
         <div class="home__stat-divider"></div>
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.episodes }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_EPISODES_LABEL }}</span>
-        </div>
+        <div class="home__stat-skeleton"></div>
         <div class="home__stat-divider"></div>
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.locations }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_LOCATIONS_LABEL }}</span>
-        </div>
+        <div class="home__stat-skeleton"></div>
       </div>
     }
   </section>

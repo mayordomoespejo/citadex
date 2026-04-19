@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, DeferBlockBehavior, DeferBlockState } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -24,6 +24,7 @@ describe('Home', () => {
         provideRouter([]),
         { provide: HomeService, useValue: createHomeServiceMock() },
       ],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
     }).compileComponents();
 
     fixture = TestBed.createComponent(Home);
@@ -63,6 +64,8 @@ describe('Home', () => {
   });
 
   it('should display stats after service resolves', async () => {
+    const deferBlocks = await fixture.getDeferBlocks();
+    await deferBlocks[0].render(DeferBlockState.Complete);
     await fixture.whenStable();
     fixture.detectChanges();
     const statValues = el.querySelectorAll('.home__stat-value');

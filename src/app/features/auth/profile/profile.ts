@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { User, deleteUser } from 'firebase/auth';
 
@@ -19,15 +19,30 @@ import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
  * and permanent account deletion. Account deletion re-authenticates via Google popup
  * when Firebase requires a recent login before the operation is allowed.
  */
-export class Profile {
+export class Profile implements AfterViewChecked {
   private readonly authService = inject(AuthService);
   private readonly favoritesService = inject(FavoritesService);
   private readonly router = inject(Router);
+
+  @ViewChild('deleteAccountBtn') private readonly deleteAccountBtn?: ElementRef<HTMLButtonElement>;
+  @ViewChild('modalCancelBtn') private readonly modalCancelBtn?: ElementRef<HTMLButtonElement>;
 
   protected readonly T = TEXTS;
   protected readonly showDeleteModal = signal(false);
   protected readonly isDeleting = signal(false);
   protected readonly deleteError = signal<string | null>(null);
+
+  private pendingFocus: 'modal' | 'deleteBtn' | null = null;
+
+  ngAfterViewChecked(): void {
+    if (this.pendingFocus === 'modal' && this.modalCancelBtn?.nativeElement) {
+      this.modalCancelBtn.nativeElement.focus();
+      this.pendingFocus = null;
+    } else if (this.pendingFocus === 'deleteBtn' && this.deleteAccountBtn?.nativeElement) {
+      this.deleteAccountBtn.nativeElement.focus();
+      this.pendingFocus = null;
+    }
+  }
 
   protected readonly user = this.authService.user;
   protected readonly favoritesCount = computed(() => this.favoritesService.favorites().length);
@@ -50,12 +65,14 @@ export class Profile {
   protected openDeleteModal(): void {
     this.deleteError.set(null);
     this.showDeleteModal.set(true);
+    this.pendingFocus = 'modal';
   }
 
   /** Closes the account deletion confirmation modal and clears any error state. */
   protected closeDeleteModal(): void {
     this.showDeleteModal.set(false);
     this.deleteError.set(null);
+    this.pendingFocus = 'deleteBtn';
   }
 
   /** Initiates account deletion: clears favorites and navigates to login on success. */

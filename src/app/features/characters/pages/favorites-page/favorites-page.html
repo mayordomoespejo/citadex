@@ -12,7 +12,7 @@
 
   @if (isLoading()) {
     <div class="favorites-page__skeleton-grid">
-      @for (item of skeletonItems; track $index) {
+      @for (item of skeletonItems; track item) {
         <div class="favorites-page__skeleton-card">
           <div class="favorites-page__skeleton-image"></div>
         </div>
