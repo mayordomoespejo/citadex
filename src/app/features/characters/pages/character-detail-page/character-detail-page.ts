@@ -10,6 +10,9 @@ import { Character, Episode } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 import { CharacterStatus } from '../../components/character-status/character-status';
 
+/** Number of episodes shown in preview before the "show all" toggle. */
+const EPISODES_PREVIEW_COUNT = 10;
+
 /**
  * Displays the full profile of a single character.
  * Dynamically updates the browser tab title with the character's name
@@ -36,10 +39,10 @@ export class CharacterDetailPage implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly episodes = signal<Episode[]>([]);
   protected readonly isLoadingEpisodes = signal(false);
+  protected readonly episodesError = signal(false);
   protected readonly showAllEpisodes = signal(false);
 
-  /** Number of episodes shown in preview before the "show all" toggle. */
-  protected readonly EPISODES_PREVIEW_COUNT = 10;
+  protected readonly EPISODES_PREVIEW_COUNT = EPISODES_PREVIEW_COUNT;
 
   /** Derived from FavoritesService — intentionally local to each component that needs favorite state. The service is the single source of truth. */
   protected readonly isFavorite = computed(() => {
@@ -105,6 +108,7 @@ export class CharacterDetailPage implements OnInit {
         },
         error: () => {
           this.isLoadingEpisodes.set(false);
+          this.episodesError.set(true);
         },
       });
   }

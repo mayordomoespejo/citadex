@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
@@ -36,6 +35,4 @@ export class FavoritesPage {
 
   // Characters come directly from the service's in-memory favorites map
   protected readonly characters = this.favoritesService.favorites;
-
-  protected readonly isLoading = signal(false);
 }
