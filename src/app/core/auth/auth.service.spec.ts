@@ -1,29 +1,33 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
-vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn(() => vi.fn()),
-  createUserWithEmailAndPassword: vi.fn(),
-  signInWithEmailAndPassword: vi.fn(),
-  signOut: vi.fn(),
-  signInWithPopup: vi.fn(),
-  reauthenticateWithPopup: vi.fn(),
-  GoogleAuthProvider: class {},
-  getAuth: vi.fn(() => ({})),
-  deleteUser: vi.fn().mockResolvedValue(undefined),
-  getIdToken: vi.fn(),
-}));
-
-import * as firebaseAuth from 'firebase/auth';
 import { AuthService, isFirebaseError, mapFirebaseError } from './auth.service';
+import { FIREBASE_AUTH_ADAPTER } from '../firebase/firebase-auth.adapter';
+import type { FirebaseAuthAdapter } from '../firebase/firebase-auth.adapter';
+
+function createMockAdapter(): FirebaseAuthAdapter {
+  return {
+    onAuthStateChanged: vi.fn(() => vi.fn()),
+    createUserWithEmailAndPassword: vi.fn(),
+    signInWithEmailAndPassword: vi.fn(),
+    signInWithPopup: vi.fn(),
+    reauthenticateWithPopup: vi.fn(),
+    signOut: vi.fn(),
+    getIdToken: vi.fn(),
+    deleteUser: vi.fn().mockResolvedValue(undefined),
+  };
+}
 
 describe('AuthService', () => {
   let service: AuthService;
+  let adapter: FirebaseAuthAdapter;
 
   beforeEach(() => {
-    vi.mocked(firebaseAuth.onAuthStateChanged).mockReturnValue(vi.fn() as unknown as () => void);
+    adapter = createMockAdapter();
 
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [{ provide: FIREBASE_AUTH_ADAPTER, useValue: adapter }],
+    });
     service = TestBed.inject(AuthService);
   });
 
@@ -35,18 +39,15 @@ describe('AuthService', () => {
   describe('init()', () => {
     it('registers onAuthStateChanged listener', () => {
       service.init();
-      expect(firebaseAuth.onAuthStateChanged).toHaveBeenCalledOnce();
+      expect(adapter.onAuthStateChanged).toHaveBeenCalledOnce();
     });
 
     it('updates user signal when auth state changes to a logged-in user', () => {
       const mockUser = { uid: 'user-123', email: 'test@example.com' } as never;
-      vi.mocked(firebaseAuth.onAuthStateChanged).mockImplementation(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (_auth: any, callback: any) => {
-          callback(mockUser);
-          return vi.fn();
-        },
-      );
+      vi.mocked(adapter.onAuthStateChanged).mockImplementation((callback) => {
+        callback(mockUser);
+        return vi.fn();
+      });
 
       service.init();
 
@@ -56,13 +57,10 @@ describe('AuthService', () => {
     });
 
     it('sets user to null and loading to false when signed out', () => {
-      vi.mocked(firebaseAuth.onAuthStateChanged).mockImplementation(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (_auth: any, callback: any) => {
-          callback(null);
-          return vi.fn();
-        },
-      );
+      vi.mocked(adapter.onAuthStateChanged).mockImplementation((callback) => {
+        callback(null);
+        return vi.fn();
+      });
 
       service.init();
 
@@ -74,41 +72,41 @@ describe('AuthService', () => {
 
   describe('smartAuth()', () => {
     it('calls createUserWithEmailAndPassword for new account', async () => {
-      vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockResolvedValue({} as never);
+      vi.mocked(adapter.createUserWithEmailAndPassword).mockResolvedValue(undefined);
 
       await service.smartAuth('new@example.com', 'password123');
 
-      expect(firebaseAuth.createUserWithEmailAndPassword).toHaveBeenCalledOnce();
-      expect(firebaseAuth.signInWithEmailAndPassword).not.toHaveBeenCalled();
+      expect(adapter.createUserWithEmailAndPassword).toHaveBeenCalledOnce();
+      expect(adapter.signInWithEmailAndPassword).not.toHaveBeenCalled();
     });
 
     it('falls back to signIn when email is already in use', async () => {
-      vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockRejectedValue({
+      vi.mocked(adapter.createUserWithEmailAndPassword).mockRejectedValue({
         code: 'auth/email-already-in-use',
       });
-      vi.mocked(firebaseAuth.signInWithEmailAndPassword).mockResolvedValue({} as never);
+      vi.mocked(adapter.signInWithEmailAndPassword).mockResolvedValue(undefined);
 
       await service.smartAuth('existing@example.com', 'password123');
 
-      expect(firebaseAuth.signInWithEmailAndPassword).toHaveBeenCalledOnce();
+      expect(adapter.signInWithEmailAndPassword).toHaveBeenCalledOnce();
     });
 
     it('re-throws non-email-already-in-use errors', async () => {
       const error = { code: 'auth/network-request-failed' };
-      vi.mocked(firebaseAuth.createUserWithEmailAndPassword).mockRejectedValue(error);
+      vi.mocked(adapter.createUserWithEmailAndPassword).mockRejectedValue(error);
 
       await expect(service.smartAuth('test@example.com', 'pass')).rejects.toEqual(error);
-      expect(firebaseAuth.signInWithEmailAndPassword).not.toHaveBeenCalled();
+      expect(adapter.signInWithEmailAndPassword).not.toHaveBeenCalled();
     });
   });
 
   describe('signOut()', () => {
     it('calls Firebase signOut', async () => {
-      vi.mocked(firebaseAuth.signOut).mockResolvedValue(undefined);
+      vi.mocked(adapter.signOut).mockResolvedValue(undefined);
 
       await service.signOut();
 
-      expect(firebaseAuth.signOut).toHaveBeenCalledOnce();
+      expect(adapter.signOut).toHaveBeenCalledOnce();
     });
   });
 });

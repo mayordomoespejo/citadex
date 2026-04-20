@@ -1,8 +1,9 @@
 import { AfterViewChecked, ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, deleteUser } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 import { AuthService, isFirebaseError } from '../../../core/auth/auth.service';
+import { FIREBASE_AUTH_ADAPTER } from '../../../core/firebase/firebase-auth.adapter';
 import { FavoritesService } from '../../characters/services/favorites.service';
 import { TEXTS } from '../../../shared/i18n/texts';
 import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
@@ -21,6 +22,7 @@ import { UserAvatar } from '../../../shared/components/user-avatar/user-avatar';
  */
 export class Profile implements AfterViewChecked {
   private readonly authService = inject(AuthService);
+  private readonly fb = inject(FIREBASE_AUTH_ADAPTER);
   private readonly favoritesService = inject(FavoritesService);
   private readonly router = inject(Router);
 
@@ -97,11 +99,11 @@ export class Profile implements AfterViewChecked {
   /** Attempts to delete the user, re-authenticating via Google if a recent login is required. */
   private async performDeletion(user: User): Promise<void> {
     try {
-      await deleteUser(user);
+      await this.fb.deleteUser(user);
     } catch (err: unknown) {
       if (isFirebaseError(err) && err.code === 'auth/requires-recent-login') {
         await this.authService.reauthenticateWithGoogle();
-        await deleteUser(user);
+        await this.fb.deleteUser(user);
       } else {
         throw err;
       }

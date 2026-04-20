@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { IconComponent } from '../icon/icon';
 
 /** A single option in the select dropdown. */
 export interface SelectOption {
@@ -24,6 +25,7 @@ export interface SelectOption {
  */
 @Component({
   selector: 'app-select',
+  imports: [IconComponent],
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

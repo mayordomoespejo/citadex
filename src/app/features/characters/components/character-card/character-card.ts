@@ -6,12 +6,13 @@ import { Character } from '../../models/character.model';
 import { FavoritesService } from '../../services/favorites.service';
 import { TEXTS } from '../../../../shared/i18n/texts';
 import { CharacterStatus } from '../character-status/character-status';
+import { IconComponent } from '../../../../shared/components/icon/icon';
 
 /** Presentational card component that displays a single character in the grid and navigates to the detail page on click. */
 @Component({
   selector: 'app-character-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, NgOptimizedImage, CharacterStatus],
+  imports: [RouterLink, NgOptimizedImage, CharacterStatus, IconComponent],
   templateUrl: './character-card.html',
   styleUrl: './character-card.scss',
 })

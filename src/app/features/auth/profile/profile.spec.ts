@@ -7,7 +7,19 @@ import { signal } from '@angular/core';
 import { Profile } from './profile';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../characters/services/favorites.service';
+import { FIREBASE_AUTH_ADAPTER } from '../../../core/firebase/firebase-auth.adapter';
 import { TEXTS } from '../../../shared/i18n/texts';
+
+const mockFirebaseAdapter = {
+  onAuthStateChanged: vi.fn(() => vi.fn()),
+  createUserWithEmailAndPassword: vi.fn(),
+  signInWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  reauthenticateWithPopup: vi.fn(),
+  signOut: vi.fn(),
+  getIdToken: vi.fn(),
+  deleteUser: vi.fn().mockResolvedValue(undefined),
+};
 
 const mockFirebaseUser = {
   uid: 'user-123',
@@ -51,6 +63,7 @@ describe('Profile', () => {
         provideRouter([]),
         { provide: AuthService, useValue: mockAuthService },
         { provide: FavoritesService, useValue: mockFavoritesService },
+        { provide: FIREBASE_AUTH_ADAPTER, useValue: mockFirebaseAdapter },
       ],
     }).compileComponents();
 
@@ -182,6 +195,7 @@ describe('Profile', () => {
         provideRouter([]),
         { provide: AuthService, useValue: mockAuthService },
         { provide: FavoritesService, useValue: mockFavoritesService },
+        { provide: FIREBASE_AUTH_ADAPTER, useValue: mockFirebaseAdapter },
       ],
     }).compileComponents();
 

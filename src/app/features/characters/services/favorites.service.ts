@@ -1,6 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { User, getIdToken } from 'firebase/auth';
 import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
@@ -167,13 +166,7 @@ export class FavoritesService {
     }
   }
 
-  private async getToken(forceRefresh = false): Promise<string | null> {
-    const user = this.authService.user();
-    if (!user) return null;
-    try {
-      return await getIdToken(user as User, forceRefresh);
-    } catch {
-      return null;
-    }
+  private getToken(forceRefresh = false): Promise<string | null> {
+    return this.authService.getIdToken(forceRefresh);
   }
 }

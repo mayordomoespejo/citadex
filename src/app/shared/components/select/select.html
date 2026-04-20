@@ -16,21 +16,7 @@
     aria-controls="select-dropdown"
   >
     <span class="select__value">{{ selectedLabel() }}</span>
-    <svg
-      class="select__chevron"
-      xmlns="http://www.w3.org/2000/svg"
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
+    <app-icon class="select__chevron" name="chevron-down" />
   </button>
 
   @if (isOpen()) {
@@ -46,9 +32,7 @@
         >
           {{ option.label }}
           @if (option.value === value()) {
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
+            <app-icon name="check" />
           }
         </li>
       }

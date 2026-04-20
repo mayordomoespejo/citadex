@@ -1,18 +1,10 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-// Mock firebase/auth (non-relative — allowed by Angular unit-test runner)
-vi.mock('firebase/auth', () => ({
-  getIdToken: vi.fn(),
-  onAuthStateChanged: vi.fn(() => vi.fn()),
-  getAuth: vi.fn(() => ({})),
-}));
-
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 
-import * as firebaseAuth from 'firebase/auth';
 import { FavoritesService } from './favorites.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { environment } from '../../../../environments/environment';
@@ -47,6 +39,7 @@ function flushMicrotasks(): Promise<void> {
 /** Sets up TestBed with user signal starting as null so the constructor effect doesn't fire. */
 function setup() {
   const userSignal = signal<typeof mockUser | null>(null);
+  const getIdToken = vi.fn<() => Promise<string | null>>();
 
   TestBed.configureTestingModule({
     providers: [
@@ -54,7 +47,7 @@ function setup() {
       provideHttpClientTesting(),
       {
         provide: AuthService,
-        useValue: { user: userSignal },
+        useValue: { user: userSignal, getIdToken },
       },
     ],
   });
@@ -62,7 +55,7 @@ function setup() {
   const service = TestBed.inject(FavoritesService);
   const httpMock = TestBed.inject(HttpTestingController);
 
-  return { service, httpMock, userSignal };
+  return { service, httpMock, userSignal, getIdToken };
 }
 
 describe('FavoritesService', () => {
@@ -73,8 +66,8 @@ describe('FavoritesService', () => {
 
   describe('loadFavorites()', () => {
     it('populates favorites signal from API response', async () => {
-      vi.mocked(firebaseAuth.getIdToken).mockResolvedValue('token-abc');
-      const { service, httpMock, userSignal } = setup();
+      const { service, httpMock, userSignal, getIdToken } = setup();
+      getIdToken.mockResolvedValue('token-abc');
       userSignal.set(mockUser as never);
 
       const promise = service.loadFavorites();
@@ -98,8 +91,8 @@ describe('FavoritesService', () => {
     });
 
     it('sets error signal when load fails', async () => {
-      vi.mocked(firebaseAuth.getIdToken).mockResolvedValue('token-abc');
-      const { service, httpMock, userSignal } = setup();
+      const { service, httpMock, userSignal, getIdToken } = setup();
+      getIdToken.mockResolvedValue('token-abc');
       userSignal.set(mockUser as never);
 
       const promise = service.loadFavorites();
@@ -126,12 +119,12 @@ describe('FavoritesService', () => {
 
   describe('401 retry', () => {
     it('refreshes token and retries on 401', async () => {
-      vi.mocked(firebaseAuth.getIdToken)
+      const { service, httpMock, userSignal, getIdToken } = setup();
+      getIdToken
         .mockResolvedValueOnce('stale-token')   // first attempt
         .mockResolvedValueOnce('fresh-token')   // retry after 401
         .mockResolvedValue('fresh-token');       // any effect-triggered calls
 
-      const { service, httpMock, userSignal } = setup();
       userSignal.set(mockUser as never);
 
       const promise = service.loadFavorites();
@@ -172,8 +165,8 @@ describe('FavoritesService', () => {
 
   describe('optimistic update rollback', () => {
     it('reverts addFavorite if POST fails', async () => {
-      vi.mocked(firebaseAuth.getIdToken).mockResolvedValue('token-abc');
-      const { service, httpMock, userSignal } = setup();
+      const { service, httpMock, userSignal, getIdToken } = setup();
+      getIdToken.mockResolvedValue('token-abc');
       userSignal.set(mockUser as never);
 
       // Drain any initial effect-triggered GET requests
@@ -203,8 +196,8 @@ describe('FavoritesService', () => {
     });
 
     it('reverts removeFavorite if DELETE fails', async () => {
-      vi.mocked(firebaseAuth.getIdToken).mockResolvedValue('token-abc');
-      const { service, httpMock, userSignal } = setup();
+      const { service, httpMock, userSignal, getIdToken } = setup();
+      getIdToken.mockResolvedValue('token-abc');
       userSignal.set(mockUser as never);
 
       // Pre-populate favorites via loadFavorites

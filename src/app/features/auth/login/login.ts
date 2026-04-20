@@ -4,13 +4,14 @@ import { Router, RouterLink } from '@angular/router';
 
 import { AuthService, mapFirebaseError } from '../../../core/auth/auth.service';
 import { TEXTS } from '../../../shared/i18n/texts';
+import { IconComponent } from '../../../shared/components/icon/icon';
 
 /** Duration in ms of the intro fade-out animation — must match the CSS transition duration. */
 const INTRO_ANIMATION_DURATION_MS = 1800;
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

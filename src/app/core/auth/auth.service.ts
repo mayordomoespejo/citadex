@@ -1,16 +1,7 @@
-import { Injectable, OnDestroy, computed, signal } from '@angular/core';
-import {
-  GoogleAuthProvider,
-  User,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  reauthenticateWithPopup,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from 'firebase/auth';
+import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
+import type { User } from 'firebase/auth';
 
-import { auth } from '../firebase/firebase.config';
+import { FIREBASE_AUTH_ADAPTER } from '../firebase/firebase-auth.adapter';
 import { TEXTS } from '../../shared/i18n/texts';
 
 /**
@@ -50,10 +41,14 @@ export function mapFirebaseError(err: unknown, fallback: string): string {
 /**
  * Singleton service that manages Firebase authentication state.
  * Exposes reactive signals (`user`, `loading`, `isAuthenticated`) and methods for
- * email/password sign-up, sign-in, Google OAuth, sign-out, and re-authentication.
+ * email/password sign-up, sign-in, Google OAuth, sign-out, re-authentication, and token retrieval.
+ * All Firebase SDK calls are delegated to the injected `FirebaseAuthAdapter`, making this
+ * service fully testable without module-level mocks.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
+  private readonly fb = inject(FIREBASE_AUTH_ADAPTER);
+
   readonly user = signal<User | null>(null);
   readonly loading = signal(true);
   readonly isAuthenticated = computed(() => !!this.user());
@@ -62,7 +57,7 @@ export class AuthService implements OnDestroy {
 
   /** Must be called once from the app root to start listening to auth state. */
   init(): void {
-    this.unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    this.unsubscribeAuth = this.fb.onAuthStateChanged((user) => {
       this.user.set(user);
       this.loading.set(false);
     });
@@ -73,11 +68,11 @@ export class AuthService implements OnDestroy {
   }
 
   signInWithEmail(email: string, password: string): Promise<void> {
-    return signInWithEmailAndPassword(auth, email, password).then(() => undefined);
+    return this.fb.signInWithEmailAndPassword(email, password);
   }
 
   signUpWithEmail(email: string, password: string): Promise<void> {
-    return createUserWithEmailAndPassword(auth, email, password).then(() => undefined);
+    return this.fb.createUserWithEmailAndPassword(email, password);
   }
 
   /**
@@ -97,20 +92,31 @@ export class AuthService implements OnDestroy {
   }
 
   signInWithGoogle(): Promise<void> {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider).then(() => undefined);
+    return this.fb.signInWithPopup();
   }
 
   reauthenticateWithGoogle(): Promise<void> {
     const user = this.user();
     if (!user) return Promise.reject(new Error('No user is signed in'));
-    const provider = new GoogleAuthProvider();
-    return reauthenticateWithPopup(user, provider).then(() => undefined);
+    return this.fb.reauthenticateWithPopup(user);
   }
 
   /** Signs the current user out of Firebase and clears the local auth state. */
   signOut(): Promise<void> {
-    return signOut(auth);
+    return this.fb.signOut();
   }
 
+  /**
+   * Returns a Firebase ID token for the current user, or null if not signed in.
+   * Pass `forceRefresh: true` to bypass the cache and obtain a fresh token.
+   */
+  async getIdToken(forceRefresh = false): Promise<string | null> {
+    const user = this.user();
+    if (!user) return null;
+    try {
+      return await this.fb.getIdToken(user, forceRefresh);
+    } catch {
+      return null;
+    }
+  }
 }

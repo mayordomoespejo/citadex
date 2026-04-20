@@ -4,6 +4,8 @@ import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { routes } from './app.routes';
 import { AppTitleStrategy } from './core/app-title.strategy';
+import { FIREBASE_AUTH_ADAPTER } from './core/firebase/firebase-auth.adapter';
+import { realFirebaseAuthAdapter } from './core/firebase/firebase-auth.adapter.real';
 
 /**
  * Root application configuration.
@@ -16,5 +18,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withFetch()),
     { provide: TitleStrategy, useClass: AppTitleStrategy },
+    { provide: FIREBASE_AUTH_ADAPTER, useValue: realFirebaseAuthAdapter },
   ],
 };
