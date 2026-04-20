@@ -79,7 +79,7 @@
 
         @defer (on viewport) {
           @if (episodesError()) {
-            <p class="detail-page__episodes-error">Failed to load episodes.</p>
+            <p class="detail-page__episodes-error">{{ T.DETAIL_EPISODES_LOAD_ERROR }}</p>
           } @else if (episodes().length > 0) {
             <div class="detail-page__episodes">
               <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>

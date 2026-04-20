@@ -1,7 +1,7 @@
 @if (photoURL() && !imageError()) {
   <img
     class="user-avatar__img"
-    [src]="photoURL()!"
+    [src]="photoURL()"
     alt="User avatar"
     (error)="onImageError()"
   />
