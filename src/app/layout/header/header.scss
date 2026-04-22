@@ -36,6 +36,7 @@
 
   &__nav {
     display: flex;
+    align-items: center;
     gap: var(--space-6);
   }
 
@@ -56,4 +57,24 @@
       color: var(--color-primary);
     }
   }
+
+  &__avatar-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition:
+      box-shadow var(--transition),
+      transform var(--transition);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+
+    &--active {
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+  }
+
 }

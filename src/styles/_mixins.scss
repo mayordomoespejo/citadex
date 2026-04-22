@@ -1,0 +1,11 @@
+// ── Layout mixins ─────────────────────────────────────────────────────────────
+
+/// Constrains content to the site max-width, centers it, and adds standard
+/// inline padding. Apply to any full-width container that should match the
+/// page content column (toolbar, grid, etc.).
+@mixin page-content {
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+  width: 100%;
+}

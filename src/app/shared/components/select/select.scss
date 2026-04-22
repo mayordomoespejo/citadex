@@ -85,7 +85,6 @@ $chevron-space: calc(var(--space-2) + 12px);
     position: absolute;
     top: calc(100% + var(--space-1));
     left: 0;
-    right: 0;
     z-index: 100;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -94,7 +93,7 @@ $chevron-space: calc(var(--space-2) + 12px);
     overflow: hidden;
     list-style: none;
     padding: var(--space-1) 0;
-    min-width: 140px;
+    min-width: 100%;
   }
 
   &__option {

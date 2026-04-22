@@ -4,13 +4,13 @@ export type CharacterStatus = 'Alive' | 'Dead' | 'unknown';
 /** Biological gender as returned by the Rick & Morty API. */
 export type CharacterGender = 'Female' | 'Male' | 'Genderless' | 'unknown';
 
-/** A named location with its API resource URL. */
+/** Represents a location reference returned by the Rick & Morty API, containing the location's display name and a URL pointing to its full resource data. */
 export interface CharacterLocation {
   name: string;
   url: string;
 }
 
-/** Full character resource from the Rick & Morty API. */
+/** Maps directly to a character object returned by the Rick & Morty API, including identity, status, species, gender, origin, current location, image, and episode appearances. */
 export interface Character {
   id: number;
   name: string;
@@ -27,7 +27,7 @@ export interface Character {
   created: string;
 }
 
-/** Pagination metadata included in every list response. */
+/** Represents the pagination metadata returned by the API on every list response, including total item count, total pages, and next/prev page URLs. */
 export interface ApiInfo {
   count: number;
   pages: number;
@@ -35,7 +35,7 @@ export interface ApiInfo {
   prev: string | null;
 }
 
-/** Paginated character list response from the API. */
+/** The full paginated response wrapper returned by the characters list endpoint, combining pagination metadata with the array of character results. */
 export interface CharacterListResponse {
   info: ApiInfo;
   results: Character[];

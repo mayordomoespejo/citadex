@@ -10,27 +10,35 @@
 
     <a class="home__cta" routerLink="/characters">
       {{ T.HOME_CTA_LABEL }}
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
+      <app-icon name="arrow-right" />
     </a>
 
-    @if (stats(); as s) {
-      <div class="home__stats">
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.characters }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_CHARACTERS_LABEL }}</span>
+    @defer (on viewport) {
+      @if (stats(); as s) {
+        <div class="home__stats">
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.characters }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_CHARACTERS_LABEL }}</span>
+          </div>
+          <div class="home__stat-divider"></div>
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.episodes }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_EPISODES_LABEL }}</span>
+          </div>
+          <div class="home__stat-divider"></div>
+          <div class="home__stat">
+            <span class="home__stat-value">{{ s.locations }}</span>
+            <span class="home__stat-label">{{ T.HOME_STAT_LOCATIONS_LABEL }}</span>
+          </div>
         </div>
+      }
+    } @placeholder {
+      <div class="home__stats-skeleton">
+        <div class="home__stat-skeleton"></div>
         <div class="home__stat-divider"></div>
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.episodes }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_EPISODES_LABEL }}</span>
-        </div>
+        <div class="home__stat-skeleton"></div>
         <div class="home__stat-divider"></div>
-        <div class="home__stat">
-          <span class="home__stat-value">{{ s.locations }}</span>
-          <span class="home__stat-label">{{ T.HOME_STAT_LOCATIONS_LABEL }}</span>
-        </div>
+        <div class="home__stat-skeleton"></div>
       </div>
     }
   </section>

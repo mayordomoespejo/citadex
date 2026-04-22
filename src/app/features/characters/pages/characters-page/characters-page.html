@@ -1,4 +1,4 @@
-<section class="characters-page">
+<app-page-layout class="characters-page">
   <div class="characters-page__toolbar">
     <div class="characters-page__toolbar-left">
       <h1 class="characters-page__title">{{ T.CHARACTERS_PAGE_TITLE }}</h1>
@@ -8,13 +8,23 @@
     </div>
 
     <div class="characters-page__controls">
-      <input
-        class="characters-page__search"
-        type="search"
-        [placeholder]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
-        [attr.aria-label]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
-        [formControl]="searchControl"
-      />
+      <div class="characters-page__search-wrapper">
+        <input
+          class="characters-page__search"
+          type="search"
+          [placeholder]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
+          [attr.aria-label]="T.CHARACTERS_PAGE_SEARCH_PLACEHOLDER"
+          [formControl]="searchControl"
+        />
+        @if (hasSearchValue) {
+          <button
+            class="characters-page__search-clear"
+            type="button"
+            (click)="clearSearch()"
+            [attr.aria-label]="T.CHARACTERS_SEARCH_CLEAR_ARIA"
+          >×</button>
+        }
+      </div>
 
       <div class="characters-page__filters" [formGroup]="filtersGroup">
         <app-select [options]="statusOptions" formControlName="status" />
@@ -23,23 +33,10 @@
     </div>
   </div>
 
-  @if (hasActiveFilters()) {
-    <div class="characters-page__chips">
-      @for (chip of activeChips(); track chip.key) {
-        <button class="characters-page__chip" (click)="removeChip(chip)">
-          <span class="characters-page__chip-label">{{ chip.label }}: {{ chip.value }}</span>
-          <span class="characters-page__chip-remove" aria-hidden="true">×</span>
-        </button>
-      }
-      <button class="characters-page__clear-btn" (click)="clearFilters()">
-        {{ T.CHARACTERS_FILTERS_CLEAR_ALL }}
-      </button>
-    </div>
-  }
 
-  @if (isLoading()) {
+@if (isLoading()) {
     <div class="characters-page__skeleton-grid">
-      @for (item of skeletonItems; track $index) {
+      @for (item of skeletonItems; track item) {
         <div class="characters-page__skeleton-card">
           <div class="characters-page__skeleton-image"></div>
           <div class="characters-page__skeleton-body">
@@ -52,10 +49,11 @@
   } @else if (error()) {
     <div class="characters-page__state">
       <p class="characters-page__message characters-page__message--error">{{ error() }}</p>
+      <button class="characters-page__retry-btn" type="button" (click)="onRetry()" [attr.aria-label]="T.COMMON_RETRY_ARIA">{{ T.COMMON_RETRY_LABEL }}</button>
     </div>
   } @else if (characters().length === 0) {
     <div class="characters-page__state">
-      <p class="characters-page__empty-icon">🔍</p>
+      <p class="characters-page__empty-icon" aria-hidden="true">🔍</p>
       <p class="characters-page__message">{{ T.CHARACTERS_PAGE_EMPTY }}</p>
     </div>
   } @else {
@@ -71,22 +69,24 @@
           class="characters-page__page-btn"
           [disabled]="currentPage() === 1"
           (click)="goToPage(currentPage() - 1)"
+          [attr.aria-label]="T.CHARACTERS_PAGE_PAGINATION_PREV"
         >
-          {{ T.CHARACTERS_PAGE_PAGINATION_PREV }}
+          ←
         </button>
 
         <span class="characters-page__page-info">
-          {{ T.CHARACTERS_PAGE_PAGINATION_PAGE }} {{ currentPage() }} {{ T.CHARACTERS_PAGE_PAGINATION_OF }} {{ pageInfo.pages }}
+          {{ currentPage() }} / {{ pageInfo.pages }}
         </span>
 
         <button
           class="characters-page__page-btn"
           [disabled]="!pageInfo.next"
           (click)="goToPage(currentPage() + 1)"
+          [attr.aria-label]="T.CHARACTERS_PAGE_PAGINATION_NEXT"
         >
-          {{ T.CHARACTERS_PAGE_PAGINATION_NEXT }}
+          →
         </button>
       </nav>
     }
   }
-</section>
+</app-page-layout>

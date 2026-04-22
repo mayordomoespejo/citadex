@@ -5,21 +5,39 @@
     </a>
 
     <nav class="header__nav">
-      <a
-        class="header__nav-link"
-        routerLink="/characters"
-        routerLinkActive="header__nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        {{ T.HEADER_NAV_CHARACTERS }}
-      </a>
-      <a
-        class="header__nav-link"
-        routerLink="/favorites"
-        routerLinkActive="header__nav-link--active"
-      >
-        {{ T.HEADER_NAV_FAVORITES }}
-      </a>
+      @if (isAuthenticated()) {
+        <a
+          class="header__nav-link"
+          routerLink="/characters"
+          routerLinkActive="header__nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ T.HEADER_NAV_CHARACTERS }}
+        </a>
+        <a
+          class="header__nav-link"
+          routerLink="/favorites"
+          routerLinkActive="header__nav-link--active"
+        >
+          {{ T.HEADER_NAV_FAVORITES }}
+        </a>
+        <a
+          class="header__avatar-link"
+          routerLink="/profile"
+          routerLinkActive="header__avatar-link--active"
+          [attr.aria-label]="T.HEADER_NAV_PROFILE"
+        >
+          <app-user-avatar [photoURL]="userPhotoURL()" [initial]="userInitial() ?? '?'" size="sm" />
+        </a>
+      } @else {
+        <a
+          class="header__nav-link"
+          routerLink="/login"
+          routerLinkActive="header__nav-link--active"
+        >
+          {{ T.HEADER_NAV_LOGIN }}
+        </a>
+      }
     </nav>
   </div>
 </header>

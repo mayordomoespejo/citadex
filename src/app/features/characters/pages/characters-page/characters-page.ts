@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -9,14 +9,15 @@ import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } f
 import { CharactersService } from '../../services/characters.service';
 import { CharacterCard } from '../../components/character-card/character-card';
 import { SelectComponent } from '../../../../shared/components/select/select';
+import { PageLayout } from '../../../../shared/components/page-layout/page-layout';
 import { Character, ApiInfo } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
 
-interface FilterChip {
-  key: 'name' | 'status' | 'gender';
-  label: string;
-  value: string;
-}
+/** Debounce delay in ms to avoid triggering API calls on every keystroke. */
+const SEARCH_DEBOUNCE_MS = 400;
+
+/** Number of skeleton cards to show while characters are loading. */
+const SKELETON_COUNT = 20;
 
 /**
  * Lists all characters with real-time search, dropdown filters and pagination.
@@ -25,9 +26,10 @@ interface FilterChip {
  */
 @Component({
   selector: 'app-characters-page',
-  imports: [CharacterCard, ReactiveFormsModule, SelectComponent],
+  imports: [CharacterCard, ReactiveFormsModule, SelectComponent, PageLayout],
   templateUrl: './characters-page.html',
   styleUrl: './characters-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharactersPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -42,7 +44,7 @@ export class CharactersPage implements OnInit {
   });
 
   protected readonly T = TEXTS;
-  protected readonly skeletonItems = Array(20).fill(null);
+  protected readonly skeletonItems = Array(SKELETON_COUNT).fill(null);
 
   protected readonly statusOptions = [
     { label: TEXTS.CHARACTERS_FILTER_STATUS_ALL, value: '' },
@@ -65,25 +67,22 @@ export class CharactersPage implements OnInit {
   protected readonly isLoading = signal(false);
   protected readonly error = signal<string | null>(null);
 
-  /** Tracks current active filter values for chip rendering. */
-  protected readonly activeFilters = signal<{ name: string; status: string; gender: string }>({
-    name: '',
-    status: '',
-    gender: '',
-  });
+  protected get hasSearchValue(): boolean {
+    return this.searchControl.value.length > 0;
+  }
 
-  protected readonly activeChips = computed<FilterChip[]>(() => {
-    const f = this.activeFilters();
-    const chips: FilterChip[] = [];
-    if (f.name) chips.push({ key: 'name', label: TEXTS.CHARACTERS_FILTER_CHIP_NAME, value: f.name });
-    if (f.status) chips.push({ key: 'status', label: TEXTS.CHARACTERS_FILTER_CHIP_STATUS, value: f.status });
-    if (f.gender) chips.push({ key: 'gender', label: TEXTS.CHARACTERS_FILTER_CHIP_GENDER, value: f.gender });
-    return chips;
-  });
-
-  protected readonly hasActiveFilters = computed(() => this.activeChips().length > 0);
+  /** Clears the search input and removes the search query parameter from the URL. */
+  protected clearSearch(): void {
+    this.searchControl.setValue('');
+  }
 
   ngOnInit(): void {
+    this.setupQueryParamListener();
+    this.setupSearchListener();
+    this.setupFilterListener();
+  }
+
+  private setupQueryParamListener(): void {
     this.route.queryParamMap
       .pipe(
         map((params) => ({
@@ -96,7 +95,6 @@ export class CharactersPage implements OnInit {
           this.searchControl.setValue(name, { emitEvent: false });
           this.filtersGroup.setValue({ status, gender }, { emitEvent: false });
           this.currentPage.set(page);
-          this.activeFilters.set({ name, status, gender });
           this.isLoading.set(true);
           this.error.set(null);
         }),
@@ -121,16 +119,20 @@ export class CharactersPage implements OnInit {
         this.info.set(response.info);
         this.isLoading.set(false);
       });
+  }
 
+  private setupSearchListener(): void {
     this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .pipe(debounceTime(SEARCH_DEBOUNCE_MS), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((name) => {
         this.router.navigate([], {
           queryParams: { name: name || null, page: null },
           queryParamsHandling: 'merge',
         });
       });
+  }
 
+  private setupFilterListener(): void {
     this.filtersGroup.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ status, gender }) => {
@@ -141,6 +143,7 @@ export class CharactersPage implements OnInit {
       });
   }
 
+  /** Navigates to the given page by updating the page query parameter. */
   protected goToPage(page: number): void {
     this.router.navigate([], {
       queryParams: { page },
@@ -148,17 +151,12 @@ export class CharactersPage implements OnInit {
     });
   }
 
-  protected removeChip(chip: FilterChip): void {
+  /** Retries the last failed load by resetting the error state and re-navigating with the current params. */
+  protected onRetry(): void {
+    this.error.set(null);
     this.router.navigate([], {
-      queryParams: { [chip.key]: null, page: null },
       queryParamsHandling: 'merge',
     });
   }
 
-  protected clearFilters(): void {
-    this.router.navigate([], {
-      queryParams: { name: null, status: null, gender: null, page: null },
-      queryParamsHandling: 'merge',
-    });
-  }
 }

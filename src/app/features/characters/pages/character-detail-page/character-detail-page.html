@@ -8,7 +8,7 @@
         <div class="detail-page__skeleton-line detail-page__skeleton-line--name"></div>
         <div class="detail-page__skeleton-line detail-page__skeleton-line--status"></div>
         <div class="detail-page__skeleton-facts">
-          @for (item of [1,2,3,4]; track $index) {
+          @for (item of [1,2,3,4]; track item) {
             <div class="detail-page__skeleton-fact">
               <div class="detail-page__skeleton-line detail-page__skeleton-line--label"></div>
               <div class="detail-page__skeleton-line detail-page__skeleton-line--value"></div>
@@ -20,11 +20,19 @@
   } @else if (error()) {
     <div class="detail-page__state">
       <p class="detail-page__message detail-page__message--error">{{ error() }}</p>
+      <button class="detail-page__retry-btn" type="button" (click)="onRetry()" [attr.aria-label]="T.COMMON_RETRY_ARIA">{{ T.COMMON_RETRY_LABEL }}</button>
     </div>
   } @else if (character(); as c) {
     <div class="detail-page__content">
       <div class="detail-page__image-wrapper">
-        <img class="detail-page__image" [src]="c.image" [alt]="c.name" />
+        <img
+          class="detail-page__image"
+          [ngSrc]="c.image"
+          [alt]="c.name"
+          width="300"
+          height="300"
+          priority
+        />
       </div>
 
       <div class="detail-page__info">
@@ -40,10 +48,7 @@
           </button>
         </div>
 
-        <p class="detail-page__status-line">
-          <span class="detail-page__status-dot detail-page__status-dot--{{ c.status.toLowerCase() }}"></span>
-          {{ c.status }} — {{ c.species }}
-        </p>
+        <app-character-status class="detail-page__status-line" [character]="c" />
 
         <dl class="detail-page__facts">
           <div class="detail-page__fact">
@@ -72,30 +77,38 @@
           </div>
         </dl>
 
-        @if (isLoadingEpisodes()) {
+        @defer (on viewport) {
+          @if (episodesError()) {
+            <p class="detail-page__episodes-error">{{ T.DETAIL_EPISODES_LOAD_ERROR }}</p>
+          } @else if (episodes().length > 0) {
+            <div class="detail-page__episodes">
+              <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>
+              <ul class="detail-page__episode-list">
+                @for (ep of visibleEpisodes(); track ep.id) {
+                  <li class="detail-page__episode-item">
+                    <span class="detail-page__episode-code">{{ ep.episode }}</span>
+                    <span class="detail-page__episode-name">{{ ep.name }}</span>
+                    <span class="detail-page__episode-date">{{ ep.air_date }}</span>
+                  </li>
+                }
+              </ul>
+              @if (episodes().length > EPISODES_PREVIEW_COUNT) {
+                <button class="detail-page__episodes-toggle" (click)="toggleEpisodes()">
+                  {{ showAllEpisodes() ? T.DETAIL_EPISODES_SHOW_LESS : T.DETAIL_EPISODES_SHOW_ALL }}
+                </button>
+              }
+            </div>
+          }
+        } @placeholder {
+          <div class="detail-page__episodes-placeholder"></div>
+        } @loading {
           <div class="detail-page__episodes-skeleton">
-            @for (item of [1,2,3,4,5]; track $index) {
+            @for (item of [1,2,3,4,5]; track item) {
               <div class="detail-page__episode-skeleton-row"></div>
             }
           </div>
-        } @else if (episodes().length > 0) {
-          <div class="detail-page__episodes">
-            <h2 class="detail-page__episodes-title">{{ T.DETAIL_EPISODES_SECTION_TITLE }}</h2>
-            <ul class="detail-page__episode-list">
-              @for (ep of visibleEpisodes(); track ep.id) {
-                <li class="detail-page__episode-item">
-                  <span class="detail-page__episode-code">{{ ep.episode }}</span>
-                  <span class="detail-page__episode-name">{{ ep.name }}</span>
-                  <span class="detail-page__episode-date">{{ ep.air_date }}</span>
-                </li>
-              }
-            </ul>
-            @if (episodes().length > EPISODES_PREVIEW_COUNT) {
-              <button class="detail-page__episodes-toggle" (click)="toggleEpisodes()">
-                {{ showAllEpisodes() ? T.DETAIL_EPISODES_SHOW_LESS : T.DETAIL_EPISODES_SHOW_ALL }}
-              </button>
-            }
-          </div>
+        } @error {
+          <p class="detail-page__episodes-error">{{ T.DETAIL_EPISODES_LOAD_ERROR }}</p>
         }
       </div>
     </div>

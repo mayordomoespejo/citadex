@@ -1,4 +1,5 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -7,6 +8,10 @@ import { CharactersService } from '../../services/characters.service';
 import { FavoritesService } from '../../services/favorites.service';
 import { Character, Episode } from '../../models/character.model';
 import { TEXTS } from '../../../../shared/i18n/texts';
+import { CharacterStatus } from '../../components/character-status/character-status';
+
+/** Number of episodes shown in preview before the "show all" toggle. */
+const EPISODES_PREVIEW_COUNT = 10;
 
 /**
  * Displays the full profile of a single character.
@@ -15,9 +20,10 @@ import { TEXTS } from '../../../../shared/i18n/texts';
  */
 @Component({
   selector: 'app-character-detail-page',
-  imports: [RouterLink],
+  imports: [RouterLink, NgOptimizedImage, CharacterStatus],
   templateUrl: './character-detail-page.html',
   styleUrl: './character-detail-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -33,10 +39,12 @@ export class CharacterDetailPage implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly episodes = signal<Episode[]>([]);
   protected readonly isLoadingEpisodes = signal(false);
+  protected readonly episodesError = signal(false);
   protected readonly showAllEpisodes = signal(false);
 
-  protected readonly EPISODES_PREVIEW_COUNT = 10;
+  protected readonly EPISODES_PREVIEW_COUNT = EPISODES_PREVIEW_COUNT;
 
+  /** Derived from FavoritesService — intentionally local to each component that needs favorite state. The service is the single source of truth. */
   protected readonly isFavorite = computed(() => {
     const c = this.character();
     return c ? this.favoritesService.isFavorite(c.id) : false;
@@ -49,16 +57,27 @@ export class CharacterDetailPage implements OnInit {
 
   protected toggleFavorite(): void {
     const c = this.character();
-    if (c) this.favoritesService.toggle(c.id);
+    if (c) void this.favoritesService.toggleFavorite(c);
   }
 
   protected toggleEpisodes(): void {
     this.showAllEpisodes.update((v) => !v);
   }
 
+  /** Retries the character load after a failure. */
+  protected onRetry(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.error.set(null);
+    this.isLoading.set(true);
+    this.loadCharacter(id);
+  }
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.loadCharacter(id);
+  }
 
+  private loadCharacter(id: number): void {
     this.charactersService
       .getCharacterById(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -89,6 +108,7 @@ export class CharacterDetailPage implements OnInit {
         },
         error: () => {
           this.isLoadingEpisodes.set(false);
+          this.episodesError.set(true);
         },
       });
   }

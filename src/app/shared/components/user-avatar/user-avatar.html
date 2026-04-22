@@ -1,0 +1,10 @@
+@if (photoURL() && !imageError()) {
+  <img
+    class="user-avatar__img"
+    [src]="photoURL()"
+    alt="User avatar"
+    (error)="onImageError()"
+  />
+} @else {
+  <span class="user-avatar__initial" aria-hidden="true">{{ initial() }}</span>
+}
